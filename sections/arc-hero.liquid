@@ -1,0 +1,270 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Hero Banner
+  Section: arc-hero
+  ════════════════════════════════════════════════
+  Homepage hero. Full-width image with
+  warm overlay, eyebrow, heading, text, footnote,
+  and two buttons. Upload a warm summery image of
+  someone reading outdoors.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign h = section.settings.height
+  assign align = section.settings.text_align
+-%}
+
+<section class="arc-hero arc-hero--{{ h }} arc-hero--{{ align }}" data-section-id="{{ section.id }}">
+
+  {%- if section.settings.hero_image != blank -%}
+    <img class="arc-hero__bg"
+         src="{{ section.settings.hero_image | image_url: width: 2400 }}"
+         srcset="{{ section.settings.hero_image | image_url: width: 800 }} 800w,
+                 {{ section.settings.hero_image | image_url: width: 1400 }} 1400w,
+                 {{ section.settings.hero_image | image_url: width: 2000 }} 2000w,
+                 {{ section.settings.hero_image | image_url: width: 2400 }} 2400w"
+         sizes="100vw"
+         alt="{{ section.settings.heading | escape }}"
+         loading="eager">
+  {%- else -%}
+    <div class="arc-hero__bg arc-hero__bg--placeholder"></div>
+  {%- endif -%}
+
+  <div class="arc-hero__overlay"></div>
+
+  <div class="arc-hero__inner">
+    <div class="arc-hero__content">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="arc-hero__eyebrow">{{ section.settings.eyebrow }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h1 class="arc-hero__heading">{{ section.settings.heading }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="arc-hero__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.button_1_label != blank or section.settings.button_2_label != blank -%}
+        <div class="arc-hero__buttons">
+          {%- if section.settings.button_1_label != blank -%}
+            <a class="arc-hero__btn arc-hero__btn--primary" href="{{ section.settings.button_1_url | default: '#' }}">{{ section.settings.button_1_label }}</a>
+          {%- endif -%}
+          {%- if section.settings.button_2_label != blank -%}
+            <a class="arc-hero__btn arc-hero__btn--outline" href="{{ section.settings.button_2_url | default: '#' }}">{{ section.settings.button_2_label }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.footnote != blank -%}
+        <p class="arc-hero__footnote">{{ section.settings.footnote }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; }
+
+  .arc-hero {
+    --hero-accent: var(--btn-primary-bg);
+    --hero-accent-hover: var(--btn-primary-hover-bg);
+    position:relative;
+    width:100%;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .arc-hero--small  { min-height:52vh; }
+  .arc-hero--medium { min-height:68vh; }
+  .arc-hero--large  { min-height:84vh; }
+  .arc-hero--full   { min-height:100vh; }
+
+  .arc-hero__bg {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    z-index:-2;
+  }
+  .arc-hero__bg--placeholder {
+    background:
+      radial-gradient(120% 90% at 78% 20%, #DDC29F 0%, rgba(221, 194, 159, 0) 55%),
+      linear-gradient(135deg, #DDC29F 0%, #55294A 55%, #55294A 100%);
+  }
+
+  /* Warm wash so light text stays readable over the photo */
+  .arc-hero__overlay {
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    background:
+      linear-gradient(90deg, rgba(55, 29, 43, 0.78) 0%, rgba(55, 29, 43, 0.45) 42%, rgba(55, 29, 43, 0.10) 78%, rgba(55, 29, 43, 0) 100%),
+      linear-gradient(0deg, rgba(55, 29, 43, 0.35) 0%, rgba(55, 29, 43, 0) 45%);
+  }
+  .arc-hero--center .arc-hero__overlay {
+    background:
+      linear-gradient(0deg, rgba(55, 29, 43, 0.55) 0%, rgba(55, 29, 43, 0.20) 55%, rgba(55, 29, 43, 0.35) 100%);
+  }
+
+  .arc-hero__inner {
+    width:100%;
+    max-width:1240px;
+    margin:0 auto;
+    padding:64px 40px;
+    box-sizing:border-box;
+  }
+  .arc-hero__content { max-width:620px; }
+  .arc-hero--center .arc-hero__inner { display:flex;justify-content:center; }
+  .arc-hero--center .arc-hero__content { max-width:720px;text-align:center; }
+
+  .arc-hero__eyebrow {
+    font-family:var(--font-body);
+    font-size:13.8px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:#DDC29F;
+    margin-bottom:20px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+  }
+  .arc-hero__eyebrow::before {
+    content:'';
+    width:28px;
+    height:1px;
+    background:#DDC29F;
+    display:inline-block;
+  }
+  .arc-hero--center .arc-hero__eyebrow::before { display:none; }
+
+  .arc-hero__heading {
+    font-family:var(--font-heading);
+    font-size:clamp(46px, 6.9vw, 78.2px);
+    line-height:1.04;
+    color:#F1E1DD;
+    margin:0 0 20px;
+    font-weight:500;
+    letter-spacing:-0.01em;
+  }
+
+  .arc-hero__text {
+    font-family:var(--font-body);
+    font-size:clamp(17.25px, 1.61vw, 20.7px);
+    line-height:1.65;
+    color:rgba(241, 225, 221, 0.90);
+    margin-bottom:32px;
+  }
+  .arc-hero__text p { margin:0 0 12px; }
+  .arc-hero__text p:last-child { margin-bottom:0; }
+
+  .arc-hero__buttons {
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .arc-hero--center .arc-hero__buttons { justify-content:center; }
+
+  .arc-hero__btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-family:var(--font-body);
+    font-size:16.1px;
+    letter-spacing:0.03em;
+    padding:15px 30px;
+    border-radius:8px;
+    text-decoration:none;
+    transition:all .22s cubic-bezier(.4,0,.2,1);
+    border:1.5px solid transparent;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .arc-hero__btn--primary {
+    background:var(--hero-accent);
+    color:var(--btn-primary-text);
+    border-color:var(--hero-accent);
+  }
+  .arc-hero__btn--primary:hover {
+    background:var(--hero-accent-hover);
+    border-color:var(--hero-accent-hover);
+    transform:translateY(-2px);
+    box-shadow:0 10px 28px rgba(21, 29, 44, 0.45);
+  }
+  .arc-hero__btn--outline {
+    background:rgba(241, 225, 221, 0.06);
+    color:#F1E1DD;
+    border-color:rgba(241, 225, 221, 0.55);
+    backdrop-filter:blur(2px);
+  }
+  .arc-hero__btn--outline:hover {
+    background:#F1E1DD;
+    color:var(--arc-plum);
+    border-color:#F1E1DD;
+    transform:translateY(-2px);
+  }
+
+  .arc-hero__footnote {
+    font-family:var(--font-body);
+    font-size:13.8px;
+    line-height:1.5;
+    color:rgba(241, 225, 221, 0.62);
+    margin:0;
+    font-style:italic;
+  }
+
+  @media (max-width:768px) {
+    .arc-hero--small  { min-height:60vh; }
+    .arc-hero--medium { min-height:70vh; }
+    .arc-hero--large  { min-height:82vh; }
+    .arc-hero__inner { padding:40px 20px; }
+    .arc-hero__overlay {
+      background:
+        linear-gradient(0deg, rgba(55, 29, 43, 0.85) 0%, rgba(55, 29, 43, 0.45) 55%, rgba(55, 29, 43, 0.55) 100%);
+    }
+    .arc-hero__content, .arc-hero--center .arc-hero__content { max-width:100%;text-align:left; }
+    .arc-hero--center .arc-hero__inner { justify-content:flex-start; }
+    .arc-hero--center .arc-hero__buttons { justify-content:flex-start; }
+    .arc-hero--center .arc-hero__eyebrow::before { display:inline-block; }
+    .arc-hero__btn { flex:1 1 auto; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "class": "arc-section-hero",
+  "settings": [
+    { "type": "image_picker", "id": "hero_image", "label": "Background image", "info": "Use a warm, summery photo of someone reading outdoors (by the sea, mountains, or a balcony). Landscape, at least 2000px wide." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Romance + Fantasy Booksellers · Gràcia, Barcelona" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Take Your Next Adventure With You" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Whether you're reading by the sea, in the mountains or on your balcony, we'll deliver your next romance directly to your holiday destination anywhere in Spain within 24–48h.*</p>" },
+    { "type": "text", "id": "footnote", "label": "Footnote", "default": "*Delivery times may vary slightly depending on destination." },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "button_1_label", "label": "Button 1 label", "default": "📚 Shop Books" },
+    { "type": "url", "id": "button_1_url", "label": "Button 1 link" },
+    { "type": "text", "id": "button_2_label", "label": "Button 2 label", "default": "⚔️ ACOTAR Ball → Friday" },
+    { "type": "url", "id": "button_2_url", "label": "Button 2 link" },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "height", "label": "Height", "options": [
+      { "value": "small", "label": "Small" },
+      { "value": "medium", "label": "Medium" },
+      { "value": "large", "label": "Large" },
+      { "value": "full", "label": "Full screen" }
+    ], "default": "large" },
+    { "type": "select", "id": "text_align", "label": "Content alignment", "options": [
+      { "value": "left", "label": "Left" },
+      { "value": "center", "label": "Center" }
+    ], "default": "left" }
+  ],
+  "presets": [{ "name": "Hero Banner" }]
+}
+{% endschema %}

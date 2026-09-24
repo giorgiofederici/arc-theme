@@ -1,0 +1,217 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Featured Collection
+  Section: arc-featured-collection
+  ════════════════════════════════════════════════
+  Reusable section for Sant Jordi, Preorders,
+  New Arrivals, Staff Picks, Merch — any
+  collection you want to highlight.
+  Uses arc-product-card snippet for items.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign products_to_show = section.settings.products_to_show | default: 8
+  assign columns = section.settings.columns | default: 4
+  assign bg_style = section.settings.bg_style | default: 'light'
+-%}
+
+<div
+  class="arc-fc{% if bg_style == 'dark' %} arc-fc--dark{% elsif bg_style == 'surface' %} arc-fc--surface{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="arc-fc__inner">
+
+    {%- comment -%} ── Section Header ── {%- endcomment -%}
+    {%- if section.settings.overline != blank or section.settings.heading != blank -%}
+      <div class="arc-fc__header">
+        {%- if section.settings.overline != blank -%}
+          <div class="arc-fc__overline">{{ section.settings.overline }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="arc-fc__title">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank -%}
+          <div class="arc-fc__desc">{{ section.settings.description }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Product Grid ── {%- endcomment -%}
+    {%- if collection != blank and collection.products_count > 0 -%}
+      <div class="arc-product-grid arc-product-grid--{{ columns }}">
+        {%- for product in collection.products limit: products_to_show -%}
+          {%- render 'arc-product-card', product: product, lazy_load: true -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.show_view_all and collection.products_count > products_to_show -%}
+        <div class="arc-fc__footer">
+          <a class="arc-btn arc-btn--secondary" href="{{ collection.url }}">
+            {{ section.settings.view_all_text | default: 'View all' }} <span class="arc-btn__arrow">&rarr;</span>
+          </a>
+        </div>
+      {%- endif -%}
+
+    {%- else -%}
+      <div class="arc-fc__empty">
+        <p>{{ section.settings.heading | default: 'Featured Collection' }} — no products yet. Select a collection in the theme editor.</p>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .arc-fc {
+    padding: 56px 0;
+    background: var(--bg-primary);
+  }
+  .arc-fc--surface {
+    background: var(--bg-surface);
+  }
+  .arc-fc--dark {
+    background: var(--bg-dark);
+  }
+  .arc-fc__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .arc-fc__header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .arc-fc__overline {
+    font-family: var(--font-body);
+    font-size: 13.8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    margin-bottom: 8px;
+  }
+  .arc-fc--dark .arc-fc__overline {
+    color: var(--accent-primary);
+  }
+  .arc-fc__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.84rem, 3.45vw, 2.53rem);
+    color: var(--text-heading);
+    line-height: 1.2;
+    margin: 0 0 8px;
+    font-weight: normal;
+  }
+  .arc-fc--dark .arc-fc__title {
+    color: var(--text-on-dark);
+  }
+  .arc-fc__desc {
+    font-family: var(--font-body);
+    font-size: 18.4px;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .arc-fc--dark .arc-fc__desc {
+    color: var(--text-muted-on-dark);
+  }
+  .arc-fc__footer {
+    text-align: center;
+    margin-top: 32px;
+  }
+  .arc-fc__empty {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: var(--font-body);
+    font-size: 18.4px;
+    color: var(--text-tertiary);
+    border: 1px dashed var(--border-subtle);
+    border-radius: 12px;
+  }
+  @media (max-width: 768px) {
+    .arc-fc { padding: 40px 0; }
+    .arc-fc__inner { padding: 0 20px; }
+    .arc-fc__header { margin-bottom: 28px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured Collection",
+  "tag": "section",
+  "class": "arc-section-featured-collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline text",
+      "default": "New this season"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "select",
+      "id": "bg_style",
+      "label": "Background style",
+      "options": [
+        { "value": "light", "label": "Light (parchment)" },
+        { "value": "surface", "label": "Surface (linen)" },
+        { "value": "dark", "label": "Dark (court)" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View all' button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View all button text",
+      "default": "Discover More"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collection"
+    }
+  ]
+}
+{% endschema %}

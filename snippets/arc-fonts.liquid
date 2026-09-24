@@ -1,0 +1,70 @@
+{%- comment -%}
+  A ROMANCE COURT · Fonts
+  Headings: Almendra. Body: Gentium Book Plus. Both regular weight.
+  Served from the theme's own assets, so no Google request is made and
+  nothing depends on an outside service.
+  Licences: assets/Almendra-OFL.txt and assets/GentiumBookPlus-OFL.txt.
+{%- endcomment -%}
+<style>
+  /* ── Headings: Almendra ── */
+  @font-face {
+    font-family: "Almendra";
+    src: url("{{ 'Almendra-Regular.woff2' | asset_url }}") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Almendra";
+    src: url("{{ 'Almendra-Italic.woff2' | asset_url }}") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Almendra";
+    src: url("{{ 'Almendra-Bold.woff2' | asset_url }}") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Almendra";
+    src: url("{{ 'Almendra-BoldItalic.woff2' | asset_url }}") format("woff2");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  /* ── Body: Gentium Book Plus ── */
+  @font-face {
+    font-family: "Gentium Book Plus";
+    src: url("{{ 'GentiumBookPlus-Regular.woff2' | asset_url }}") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Gentium Book Plus";
+    src: url("{{ 'GentiumBookPlus-Italic.woff2' | asset_url }}") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Gentium Book Plus";
+    src: url("{{ 'GentiumBookPlus-Bold.woff2' | asset_url }}") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Gentium Book Plus";
+    src: url("{{ 'GentiumBookPlus-BoldItalic.woff2' | asset_url }}") format("woff2");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+</style>
+{{ 'Almendra-Regular.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ 'GentiumBookPlus-Regular.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}

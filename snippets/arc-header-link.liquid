@@ -1,0 +1,38 @@
+{%- comment -%}
+  A ROMANCE COURT · Header link
+  Renders one menu link. If a "Dropdown: badge on a link" block names
+  this link, the badge and highlight are added.
+
+  Usage:
+    {%- render 'arc-header-link', link: child, blocks: section.blocks, class: 'archv__col-link' -%}
+{%- endcomment -%}
+
+{%- liquid
+  assign link_key = link.title | downcase | strip
+  assign badge_text = blank
+  assign badge_hot = false
+  assign link_style = 'none'
+
+  for block in blocks
+    if block.type == 'link_badge'
+      assign block_key = block.settings.menu_item | downcase | strip
+      if block_key == link_key
+        assign badge_text = block.settings.badge
+        assign badge_hot = block.settings.hot
+        assign link_style = block.settings.style
+      endif
+    endif
+  endfor
+
+  assign link_class = class
+  if link_style == 'accent'
+    assign link_class = class | append: ' ' | append: class | append: '--accent'
+  endif
+-%}
+
+<a class="{{ link_class }}" href="{{ link.url }}">
+  {{- link.title -}}
+  {%- if badge_text != blank -%}
+    <span class="archv__badge{% if badge_hot %} archv__badge--hot{% endif %}">{{ badge_text }}</span>
+  {%- endif -%}
+</a>

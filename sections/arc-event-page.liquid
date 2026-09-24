@@ -1,0 +1,363 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — ACOTAR Event Page
+  Section: arc-event-page
+  ════════════════════════════════════════════════
+  Dark, elegant event landing page. Choosable starry
+  image background + optional animated stars. Holds an
+  invitation notice ("doors open Friday at 14:00"),
+  the event description, optional detail rows, and a
+  call-to-action. All text light.
+
+  SETUP (to use as a standalone page):
+  1. Add this file to sections/ as arc-event-page.liquid
+  2. Sections → Add a new template → Page → name it "acotar-event".
+     In that template's JSON, add this section as the main section, e.g.:
+     { "sections": { "main": { "type": "arc-event-page" } }, "order": ["main"] }
+  3. Online Store → Pages → Add page → title it (e.g. "The ACOTAR Midnight Ball")
+     → in "Theme template" choose "acotar-event" → Save.
+  4. Customize that page to edit all the text below.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign has_image = false
+  if section.settings.bg_image != blank
+    assign has_image = true
+  endif
+-%}
+
+<section
+  class="arc-evt{% if section.settings.show_stars %} arc-evt--stars{% endif %}"
+  data-section-id="{{ section.id }}">
+
+  {%- if has_image -%}
+    <img class="arc-evt__bg"
+         src="{{ section.settings.bg_image | image_url: width: 2400 }}"
+         srcset="{{ section.settings.bg_image | image_url: width: 1000 }} 1000w,
+                 {{ section.settings.bg_image | image_url: width: 1600 }} 1600w,
+                 {{ section.settings.bg_image | image_url: width: 2400 }} 2400w"
+         sizes="100vw"
+         alt="{{ section.settings.heading | escape }}"
+         loading="eager">
+  {%- endif -%}
+
+  <div class="arc-evt__overlay" style="opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }}"></div>
+
+  {%- if section.settings.show_stars -%}
+    <div class="arc-evt__starfield" aria-hidden="true"></div>
+    <div class="arc-evt__sparkles" aria-hidden="true">
+      <span class="arc-evt__sparkle" style="top:10%;left:12%;animation-delay:0s;">✦</span>
+      <span class="arc-evt__sparkle" style="top:16%;left:86%;animation-delay:1.2s;">✧</span>
+      <span class="arc-evt__sparkle" style="top:44%;left:8%;animation-delay:2.4s;">✦</span>
+      <span class="arc-evt__sparkle" style="top:58%;left:92%;animation-delay:0.7s;">✧</span>
+      <span class="arc-evt__sparkle" style="top:82%;left:20%;animation-delay:1.9s;">✦</span>
+      <span class="arc-evt__sparkle" style="top:88%;left:78%;animation-delay:3s;">✧</span>
+    </div>
+  {%- endif -%}
+
+  <div class="arc-evt__inner">
+
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="arc-evt__eyebrow">{{ section.settings.eyebrow }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h1 class="arc-evt__heading">{{ section.settings.heading }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.intro != blank -%}
+      <div class="arc-evt__intro">{{ section.settings.intro }}</div>
+    {%- endif -%}
+
+    {%- comment -%} ── Invitation notice ── {%- endcomment -%}
+    {%- if section.settings.invite_headline != blank -%}
+      <div class="arc-evt__invite">
+        {%- if section.settings.invite_label != blank -%}
+          <div class="arc-evt__invite-label">{{ section.settings.invite_label }}</div>
+        {%- endif -%}
+        <div class="arc-evt__invite-headline">{{ section.settings.invite_headline }}</div>
+        {%- if section.settings.invite_subtext != blank -%}
+          <div class="arc-evt__invite-subtext">{{ section.settings.invite_subtext }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Detail rows (blocks) ── {%- endcomment -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="arc-evt__details">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'detail' -%}
+            <div class="arc-evt__detail" {{ block.shopify_attributes }}>
+              <div class="arc-evt__detail-label">{{ block.settings.label }}</div>
+              <div class="arc-evt__detail-value">{{ block.settings.value }}</div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Body / description ── {%- endcomment -%}
+    {%- if section.settings.body != blank -%}
+      <div class="arc-evt__divider"></div>
+      <div class="arc-evt__body">{{ section.settings.body }}</div>
+    {%- endif -%}
+
+    {%- comment -%} ── CTA ── {%- endcomment -%}
+    {%- if section.settings.button_label != blank -%}
+      <div class="arc-evt__cta">
+        <a class="arc-evt__btn" href="{{ section.settings.button_url | default: '#' }}">{{ section.settings.button_label }}</a>
+        {%- if section.settings.button_note != blank -%}
+          <div class="arc-evt__btn-note">{{ section.settings.button_note }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.closing_line != blank -%}
+      <div class="arc-evt__closing">{{ section.settings.closing_line }}</div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; }
+
+  .arc-evt {
+    --e-ink: #371D2B;
+    --e-navy: #273046;
+    --e-plum: #55294A;
+    --e-gold: #DDC29F;
+    --e-cream: #F1E1DD;
+    --e-lavender: #B2AABB;
+    position:relative;
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    isolation:isolate;
+    background:
+      radial-gradient(120% 80% at 78% 8%, rgba(85, 41, 74, 0.55) 0%, transparent 55%),
+      radial-gradient(90% 70% at 12% 92%, rgba(39, 48, 70, 0.7) 0%, transparent 60%),
+      linear-gradient(165deg, #371D2B 0%, #151D2C 45%, #273046 100%);
+  }
+
+  .arc-evt__bg { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-3; }
+  .arc-evt__overlay {
+    position:absolute;inset:0;z-index:-2;
+    background:
+      radial-gradient(85% 120% at 50% 45%, rgba(55, 29, 43, 0.4) 0%, rgba(55, 29, 43, 0.82) 100%),
+      linear-gradient(180deg, rgba(55, 29, 43, 0.7) 0%, rgba(55, 29, 43, 0.5) 45%, rgba(55, 29, 43, 0.78) 100%);
+  }
+
+  /* ── Twinkling starfield ── */
+  .arc-evt__starfield {
+    position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 10% 18%, #F1E1DD, transparent),
+      radial-gradient(1px 1px at 24% 62%, rgba(241, 225, 221, 0.85), transparent),
+      radial-gradient(1.5px 1.5px at 40% 30%, rgba(241, 225, 221, 0.9), transparent),
+      radial-gradient(1px 1px at 52% 80%, rgba(241, 225, 221, 0.75), transparent),
+      radial-gradient(1.5px 1.5px at 64% 14%, #F1E1DD, transparent),
+      radial-gradient(1px 1px at 76% 50%, rgba(241, 225, 221, 0.8), transparent),
+      radial-gradient(1.5px 1.5px at 90% 26%, rgba(241, 225, 221, 0.9), transparent),
+      radial-gradient(1px 1px at 6% 78%, rgba(241, 225, 221, 0.7), transparent),
+      radial-gradient(1px 1px at 32% 8%, rgba(241, 225, 221, 0.7), transparent),
+      radial-gradient(1px 1px at 94% 70%, rgba(241, 225, 221, 0.8), transparent),
+      radial-gradient(1.5px 1.5px at 18% 44%, rgba(241, 225, 221, 0.85), transparent),
+      radial-gradient(1px 1px at 68% 90%, rgba(241, 225, 221, 0.75), transparent),
+      radial-gradient(1px 1px at 84% 84%, rgba(241, 225, 221, 0.7), transparent),
+      radial-gradient(1.5px 1.5px at 48% 54%, rgba(241, 225, 221, 0.8), transparent);
+    background-repeat:no-repeat;
+    animation:arc-evt-twinkle 4.5s ease-in-out infinite;
+  }
+  @keyframes arc-evt-twinkle { 0%,100%{opacity:0.55;} 50%{opacity:1;} }
+
+  .arc-evt__sparkles { position:absolute;inset:0;z-index:-1;pointer-events:none; }
+  .arc-evt__sparkle {
+    position:absolute;color:var(--e-gold);font-size:14px;opacity:0;
+    text-shadow:0 0 8px rgba(221, 194, 159, 0.6);
+    animation:arc-evt-sparkle 5s ease-in-out infinite;
+  }
+  @keyframes arc-evt-sparkle {
+    0%,100%{opacity:0;transform:scale(0.6) rotate(0deg);}
+    45%,55%{opacity:0.9;transform:scale(1) rotate(20deg);}
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arc-evt__starfield { animation:none;opacity:0.8; }
+    .arc-evt__sparkle { animation:none;opacity:0.7; }
+  }
+
+  .arc-evt__inner {
+    width:100%;
+    max-width:760px;
+    margin:0 auto;
+    padding:96px 32px;
+    box-sizing:border-box;
+    text-align:center;
+  }
+
+  .arc-evt__eyebrow {
+    font-family:var(--font-body);
+    font-size:12px;letter-spacing:0.28em;text-transform:uppercase;
+    color:var(--e-gold);margin-bottom:22px;
+  }
+  .arc-evt__heading {
+    font-family:var(--font-heading);
+    font-size:clamp(34px, 6vw, 62px);line-height:1.06;
+    color:var(--e-cream);margin:0 0 24px;font-weight:500;letter-spacing:0.005em;
+    text-shadow:0 2px 26px rgba(21, 29, 44, 0.45);
+  }
+  .arc-evt__intro {
+    font-family:var(--font-body);
+    font-size:clamp(17px, 1.6vw, 20px);line-height:1.7;
+    color:var(--e-lavender);max-width:620px;margin:0 auto 40px;
+  }
+  .arc-evt__intro p { margin:0 0 12px; }
+  .arc-evt__intro p:last-child { margin-bottom:0; }
+
+  /* ── Invitation notice ── */
+  .arc-evt__invite {
+    border:1px solid rgba(221, 194, 159, 0.45);
+    border-radius:8px;
+    padding:30px 34px;
+    margin:0 auto 40px;
+    max-width:600px;
+    background:rgba(55, 29, 43, 0.35);
+    backdrop-filter:blur(2px);
+  }
+  .arc-evt__invite-label {
+    font-family:var(--font-body);
+    font-size:11px;letter-spacing:0.24em;text-transform:uppercase;
+    color:var(--e-gold);margin-bottom:12px;
+  }
+  .arc-evt__invite-headline {
+    font-family:var(--font-heading);
+    font-size:clamp(20px, 2.4vw, 27px);line-height:1.3;
+    color:var(--e-cream);margin-bottom:10px;
+  }
+  .arc-evt__invite-subtext {
+    font-family:var(--font-body);
+    font-size:15px;line-height:1.6;color:var(--e-lavender);
+  }
+
+  /* ── Detail rows ── */
+  .arc-evt__details {
+    display:flex;flex-wrap:wrap;justify-content:center;gap:14px;
+    margin:0 auto 42px;max-width:640px;
+  }
+  .arc-evt__detail {
+    flex:1 1 160px;min-width:150px;
+    border:1px solid rgba(178, 170, 187, 0.22);
+    border-radius:8px;padding:16px 18px;
+    background:rgba(241, 225, 221, 0.03);
+  }
+  .arc-evt__detail-label {
+    font-family:var(--font-body);
+    font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+    color:var(--e-gold);margin-bottom:6px;
+  }
+  .arc-evt__detail-value {
+    font-family:var(--font-body);
+    font-size:15px;line-height:1.4;color:var(--e-cream);
+  }
+
+  .arc-evt__divider {
+    width:60px;height:1px;background:var(--e-gold);opacity:0.6;
+    margin:0 auto 36px;
+  }
+  .arc-evt__body {
+    font-family:var(--font-body);
+    font-size:clamp(15px, 1.4vw, 17px);line-height:1.8;
+    color:rgba(241, 225, 221, 0.82);max-width:620px;margin:0 auto 44px;text-align:left;
+  }
+  .arc-evt__body p { margin:0 0 16px; }
+  .arc-evt__body p:last-child { margin-bottom:0; }
+  .arc-evt__body a { color:var(--e-gold);text-decoration:underline;text-underline-offset:2px; }
+  .arc-evt__body h2, .arc-evt__body h3 {
+    font-family:var(--font-heading);
+    color:var(--e-cream);font-weight:500;margin:24px 0 12px;line-height:1.2;
+  }
+
+  /* ── CTA ── */
+  .arc-evt__cta { margin-bottom:36px; }
+  .arc-evt__btn {
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:var(--font-body);
+    font-size:13px;letter-spacing:0.16em;text-transform:uppercase;
+    padding:16px 40px;border-radius:4px;text-decoration:none;
+    background:transparent;color:var(--e-gold);border:1.5px solid var(--e-gold);
+    transition:all .3s cubic-bezier(.4,0,.2,1);cursor:pointer;
+  }
+  .arc-evt__btn:hover {
+    background:var(--e-gold);color:var(--e-ink);
+    transform:translateY(-2px);box-shadow:0 0 28px rgba(221, 194, 159, 0.45);
+  }
+  .arc-evt__btn-note {
+    font-family:var(--font-body);
+    font-size:11px;letter-spacing:0.16em;text-transform:uppercase;
+    color:rgba(178, 170, 187, 0.75);margin-top:14px;
+  }
+
+  .arc-evt__closing {
+    font-family:var(--font-heading);
+    font-style:italic;font-size:clamp(16px, 1.8vw, 20px);
+    color:var(--e-gold);opacity:0.85;margin-top:8px;
+  }
+
+  @media (max-width:768px) {
+    .arc-evt__inner { padding:68px 22px; }
+    .arc-evt__invite { padding:24px 22px; }
+    .arc-evt__btn { width:100%; }
+    .arc-evt__body { text-align:left; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Event Page",
+  "tag": "section",
+  "class": "arc-section-event-page",
+  "settings": [
+    { "type": "image_picker", "id": "bg_image", "label": "Background image", "info": "A dark starry sky works best. Leave empty to use the built-in dark gradient." },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay strength", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 60 },
+    { "type": "checkbox", "id": "show_stars", "label": "Show animated stars & sparkles", "default": true },
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "An Open Court Event · Prythian Awaits" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The ACOTAR Midnight Ball" },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Something magical is coming. The countdown to our biggest event of the year has begun — a night of wonder, ceremony and celebration worthy of Prythian.</p>" },
+    { "type": "header", "content": "The Invitation" },
+    { "type": "text", "id": "invite_label", "label": "Invitation label", "default": "The Invitation" },
+    { "type": "text", "id": "invite_headline", "label": "Invitation headline", "default": "Doors to the invitations open Friday at 14:00." },
+    { "type": "textarea", "id": "invite_subtext", "label": "Invitation subtext", "default": "A limited number of invitations will be released. When the doors open, the Court will be watching — be ready." },
+    { "type": "header", "content": "Body / Description" },
+    { "type": "richtext", "id": "body", "label": "Description", "default": "<p>Join us for a midnight ball in honour of the world we love. Expect ceremony, music, and a gathering of the Court beneath the stars.</p><p>Guests will receive exclusive preorder gifts, and the evening will be a celebration worthy of Prythian — from the first candle to the final dance.</p><p>Full details, dress code and the guest list will be revealed once invitations open.</p>" },
+    { "type": "header", "content": "Call to action" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Join the Waiting List" },
+    { "type": "url", "id": "button_url", "label": "Button link" },
+    { "type": "text", "id": "button_note", "label": "Button note", "default": "Invitations open Friday · 14:00" },
+    { "type": "text", "id": "closing_line", "label": "Closing line", "default": "The Court is watching." }
+  ],
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Detail row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "When" },
+        { "type": "text", "id": "value", "label": "Value", "default": "To be revealed" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event Page",
+      "blocks": [
+        { "type": "detail", "settings": { "label": "When", "value": "To be revealed" } },
+        { "type": "detail", "settings": { "label": "Where", "value": "A Romance Court · Barcelona" } },
+        { "type": "detail", "settings": { "label": "Dress", "value": "Court attire encouraged" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

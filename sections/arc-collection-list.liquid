@@ -1,0 +1,316 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Collection List
+  Section: arc-collection-list
+  ════════════════════════════════════════════════
+  Emoji cards on palette backgrounds.
+  Column layout: emoji → title → subtitle → CTA.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_style = section.settings.bg_style | default: 'surface'
+  assign columns = section.settings.columns | default: 3
+-%}
+
+<style>
+  /* Reset Dawn wrapper */
+  #shopify-section-{{ section.id }} {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ── Section ── */
+  .arc-cl-{{ section.id }} {
+    padding: 56px 0 !important;
+    background: var(--bg-primary) !important;
+  }
+  .arc-cl-{{ section.id }}.arc-cl--surface {
+    background: var(--bg-surface) !important;
+  }
+  .arc-cl-{{ section.id }}.arc-cl--dark {
+    background: var(--bg-dark) !important;
+  }
+  .arc-cl__inner {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 32px !important;
+  }
+
+  /* ── Header ── */
+  .arc-cl__header {
+    text-align: center !important;
+    margin-bottom: 36px !important;
+  }
+  .arc-cl__overline {
+    font-family: var(--font-body) !important;
+    font-size: 13.8px!important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--accent-primary) !important;
+    margin-bottom: 8px !important;
+  }
+  .arc-cl--dark .arc-cl__overline {
+    color: var(--accent-primary) !important;
+  }
+  .arc-cl__title {
+    font-family: var(--font-heading) !important;
+    font-size: clamp(1.84rem, 3.45vw, 2.53rem)!important;
+    color: var(--text-heading) !important;
+    line-height: 1.2 !important;
+    margin: 0 0 8px !important;
+    font-weight: normal !important;
+  }
+  .arc-cl--dark .arc-cl__title {
+    color: var(--text-on-dark) !important;
+  }
+  .arc-cl__desc {
+    font-family: var(--font-body) !important;
+    font-size: 18.4px!important;
+    color: var(--text-muted) !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    line-height: 1.6 !important;
+  }
+  .arc-cl--dark .arc-cl__desc {
+    color: var(--text-muted-on-dark) !important;
+  }
+
+  /* ── Grid ── */
+  .arc-cl__grid {
+    display: grid !important;
+    gap: 14px !important;
+  }
+  .arc-cl__grid--2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .arc-cl__grid--3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .arc-cl__grid--4 { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* ── Card ── */
+  .arc-cl__card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 36px 24px 28px !important;
+    border-radius: 16px !important;
+    text-decoration: none !important;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(241, 225, 221, 0.08) !important;
+  }
+  .arc-cl__card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 32px rgba(21, 29, 44, 0.15) !important;
+  }
+
+  /* Card backgrounds */
+  .arc-cl__card--1 { background: linear-gradient(145deg, rgba(178, 170, 187, 0.15), rgba(178, 170, 187, 0.05)) !important; border-color: rgba(178, 170, 187, 0.15) !important; }
+  .arc-cl__card--2 { background: linear-gradient(145deg, rgba(85, 41, 74, 0.12), rgba(85, 41, 74, 0.04)) !important; border-color: rgba(85, 41, 74, 0.12) !important; }
+  .arc-cl__card--3 { background: linear-gradient(145deg, rgba(221, 194, 159, 0.12), rgba(221, 194, 159, 0.04)) !important; border-color: rgba(221, 194, 159, 0.12) !important; }
+  .arc-cl__card--4 { background: linear-gradient(145deg, rgba(178, 170, 187, 0.12), rgba(178, 170, 187, 0.04)) !important; border-color: rgba(178, 170, 187, 0.12) !important; }
+  .arc-cl__card--5 { background: linear-gradient(145deg, rgba(241, 225, 221, 0.12), rgba(241, 225, 221, 0.04)) !important; border-color: rgba(241, 225, 221, 0.12) !important; }
+  .arc-cl__card--6 { background: linear-gradient(145deg, rgba(85, 41, 74, 0.12), rgba(85, 41, 74, 0.04)) !important; border-color: rgba(85, 41, 74, 0.12) !important; }
+
+  /* Dark mode card backgrounds - more vibrant */
+  .arc-cl--dark .arc-cl__card--1 { background: linear-gradient(145deg, rgba(178, 170, 187, 0.2), rgba(178, 170, 187, 0.06)) !important; }
+  .arc-cl--dark .arc-cl__card--2 { background: linear-gradient(145deg, rgba(85, 41, 74, 0.25), rgba(85, 41, 74, 0.08)) !important; }
+  .arc-cl--dark .arc-cl__card--3 { background: linear-gradient(145deg, rgba(221, 194, 159, 0.2), rgba(221, 194, 159, 0.06)) !important; }
+  .arc-cl--dark .arc-cl__card--4 { background: linear-gradient(145deg, rgba(178, 170, 187, 0.2), rgba(178, 170, 187, 0.06)) !important; }
+  .arc-cl--dark .arc-cl__card--5 { background: linear-gradient(145deg, rgba(241, 225, 221, 0.2), rgba(241, 225, 221, 0.06)) !important; }
+  .arc-cl--dark .arc-cl__card--6 { background: linear-gradient(145deg, rgba(85, 41, 74, 0.2), rgba(85, 41, 74, 0.06)) !important; }
+
+  /* ── Card emoji ── */
+  .arc-cl__card-emoji {
+    font-size: 41.4px!important;
+    line-height: 1 !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* ── Card title ── */
+  .arc-cl__card-name {
+    font-family: var(--font-heading) !important;
+    font-size: 20px !important;
+    color: var(--text-heading) !important;
+    line-height: 1.2 !important;
+    margin-bottom: 6px !important;
+    font-weight: normal !important;
+  }
+  .arc-cl--dark .arc-cl__card-name {
+    color: var(--text-on-dark) !important;
+  }
+
+  /* ── Card subtitle ── */
+  .arc-cl__card-sub {
+    font-family: var(--font-body) !important;
+    font-size: 16.1px!important;
+    color: var(--text-muted) !important;
+    line-height: 1.5 !important;
+    margin-bottom: 16px !important;
+  }
+  .arc-cl--dark .arc-cl__card-sub {
+    color: var(--text-muted-on-dark) !important;
+  }
+
+  /* ── Card CTA ── */
+  .arc-cl__card-cta {
+    font-family: var(--font-body) !important;
+    font-size: 16.1px!important;
+    color: var(--accent-primary) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: auto !important;
+    text-decoration: none !important;
+  }
+  .arc-cl__card-arrow {
+    display: inline-block !important;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  }
+  .arc-cl__card:hover .arc-cl__card-arrow {
+    transform: translateX(4px) !important;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .arc-cl-{{ section.id }} { padding: 40px 0 !important; }
+    .arc-cl__inner { padding: 0 20px !important; }
+    .arc-cl__grid--3, .arc-cl__grid--4 { grid-template-columns: repeat(2, 1fr) !important; }
+    .arc-cl__card { padding: 28px 18px 22px !important; }
+    .arc-cl__card-name { font-size: 23px!important; }
+  }
+  @media (max-width: 480px) {
+    .arc-cl__grid--2, .arc-cl__grid--3, .arc-cl__grid--4 { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<div
+  class="arc-cl-{{ section.id }}{% if bg_style == 'dark' %} arc-cl--dark{% elsif bg_style == 'surface' %} arc-cl--surface{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="arc-cl__inner">
+
+    {%- if section.settings.overline != blank or section.settings.heading != blank -%}
+      <div class="arc-cl__header">
+        {%- if section.settings.overline != blank -%}
+          <div class="arc-cl__overline">{{ section.settings.overline }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="arc-cl__title">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank -%}
+          <div class="arc-cl__desc">{{ section.settings.description }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="arc-cl__grid arc-cl__grid--{{ columns }}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'collection_card' -%}
+          {%- assign coll = collections[block.settings.collection] -%}
+          {%- assign card_index = forloop.index | modulo: 6 -%}
+          {%- if card_index == 0 -%}{%- assign card_index = 6 -%}{%- endif -%}
+          <a
+            class="arc-cl__card arc-cl__card--{{ card_index }}"
+            href="{{ coll.url | default: '#' }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.emoji != blank -%}
+              <div class="arc-cl__card-emoji">{{ block.settings.emoji }}</div>
+            {%- endif -%}
+            <div class="arc-cl__card-name">{{ block.settings.title | default: coll.title }}</div>
+            {%- if block.settings.subtitle != blank -%}
+              <div class="arc-cl__card-sub">{{ block.settings.subtitle }}</div>
+            {%- endif -%}
+            <div class="arc-cl__card-cta">
+              {{ section.settings.card_cta_text | default: 'Enter the Court' }}
+              <span class="arc-cl__card-arrow">&rarr;</span>
+            </div>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection List",
+  "tag": "section",
+  "class": "arc-section-collection-list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline",
+      "default": "Find Your Genre"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Choose Your Court"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "text",
+      "id": "card_cta_text",
+      "label": "Card button text",
+      "default": "Enter the Court"
+    },
+    {
+      "type": "select",
+      "id": "bg_style",
+      "label": "Background",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "surface"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "emoji", "label": "Emoji", "default": "📖", "info": "Large emoji displayed at top of card" },
+        { "type": "text", "id": "title", "label": "Custom title", "info": "Overrides collection title" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "info": "Short description under the title" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection List",
+      "blocks": [
+        { "type": "collection_card", "settings": { "emoji": "🏰", "title": "Romantasy", "subtitle": "Wings, courts & fae" } },
+        { "type": "collection_card", "settings": { "emoji": "💕", "title": "Contemporary", "subtitle": "Real love, real feels" } },
+        { "type": "collection_card", "settings": { "emoji": "🖤", "title": "Dark Romance", "subtitle": "Not for the faint of heart" } },
+        { "type": "collection_card", "settings": { "emoji": "⚽", "title": "Sports Romance", "subtitle": "Game on" } },
+        { "type": "collection_card", "settings": { "emoji": "✨", "title": "YA", "subtitle": "First loves & epic quests" } },
+        { "type": "collection_card", "settings": { "emoji": "🌈", "title": "LGBTQ+", "subtitle": "Love is love" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,119 @@
+{%- comment -%}
+  A ROMANCE COURT · Buttons
+  Two filled styles and one outline. Colours come from the button
+  tokens in assets/arc-tokens.css, which flip automatically inside
+  dark sections (sand gold leads, blush outline second).
+    .arc-btn--primary    plum, blush text
+    .arc-btn--secondary  sand gold, plum text
+    .arc-btn--ghost      outline
+  Sizes: --sm, --lg. Modifiers: --pill, --full, --disabled.
+{%- endcomment -%}
+
+<style>
+  .arc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 18.4px;
+    letter-spacing: 0.03em;
+    padding: 12px 28px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.3;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition:
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Shine sweep on filled buttons */
+  .arc-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 -100%;
+    width: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(241, 225, 221, 0.22) 50%, transparent 100%);
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .arc-btn:hover::before { left: 100%; }
+  .arc-btn:hover { transform: translateY(-1px); }
+  .arc-btn:active { transform: scale(0.98); }
+  .arc-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+
+  .arc-btn__arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .arc-btn:hover .arc-btn__arrow { transform: translateX(4px); }
+
+  /* ── Primary: plum ── */
+  .arc-btn--primary {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border-color: var(--btn-primary-border);
+  }
+  .arc-btn--primary:hover {
+    background: var(--btn-primary-hover-bg);
+    border-color: var(--btn-primary-hover-bg);
+    box-shadow: 0 6px 20px rgba(21, 29, 44, 0.2);
+  }
+
+  /* ── Secondary: sand gold ── */
+  .arc-btn--secondary {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border-color: var(--btn-secondary-border);
+  }
+  .arc-btn--secondary:hover {
+    background: var(--btn-secondary-hover-bg);
+    box-shadow: 0 6px 20px rgba(21, 29, 44, 0.14);
+  }
+
+  /* ── Ghost: outline ── */
+  .arc-btn--ghost {
+    background: transparent;
+    color: var(--text-heading);
+    border-color: var(--border-default);
+  }
+  .arc-btn--ghost::before { display: none; }
+  .arc-btn--ghost:hover {
+    background: var(--bg-surface);
+    border-color: var(--text-heading);
+  }
+
+  /* ── Disabled ── */
+  .arc-btn--disabled,
+  .arc-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .arc-btn--disabled::before,
+  .arc-btn[disabled]::before { display: none; }
+
+  /* ── Sizes ── */
+  .arc-btn--sm { font-size: 16.1px; padding: 8px 16px; }
+  .arc-btn--lg { font-size: 20.7px; padding: 16px 36px; }
+
+  /* ── Modifiers ── */
+  .arc-btn--pill { border-radius: var(--radius-full); }
+  .arc-btn--full { width: 100%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arc-btn,
+    .arc-btn:hover { transform: none; }
+    .arc-btn::before { display: none; }
+    .arc-btn:hover .arc-btn__arrow { transform: none; }
+  }
+</style>

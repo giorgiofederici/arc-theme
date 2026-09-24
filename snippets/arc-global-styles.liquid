@@ -1,0 +1,426 @@
+{%- comment -%}
+  A ROMANCE COURT · Global styles
+  Base typography and the Dawn page elements (policies, product form,
+  badges). Colours and fonts come only from assets/arc-tokens.css.
+{%- endcomment -%}
+
+<style>
+
+  /* ── Apply fonts site-wide ── */
+  body,
+  .shopify-section,
+  .template-page,
+  .rte,
+  .rte p {
+    font-family: var(--font-body) !important;
+  }
+
+  h1, h2, h3,
+  .h1, .h2, .h3,
+  .title,
+  .page-title {
+    font-family: var(--font-heading) !important;
+    font-weight: normal !important;
+  }
+
+  h4, h5, h6,
+  .h4, .h5, .h6 {
+    font-family: var(--font-body) !important;
+  }
+
+  /* ── Page content width (policies & text pages only) ── */
+  .shopify-policy__container,
+  .shopify-policy__body {
+    max-width: 900px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* ── Page padding ── */
+  .shopify-policy__container,
+  .shopify-policy__body {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+  .shopify-policy__title {
+    margin-bottom: 32px !important;
+  }
+
+  /* ── List styles ── */
+  .rte ul,
+  .shopify-policy__body ul {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+  .rte ul li,
+  .shopify-policy__body ul li {
+    padding-left: 20px !important;
+    margin-bottom: 6px !important;
+    position: relative !important;
+    display: block !important;
+  }
+  .rte ul li::before,
+  .shopify-policy__body ul li::before {
+    content: '•' !important;
+    position: absolute !important;
+    left: 0 !important;
+    color: var(--accent-primary) !important;
+    font-size: 20.7px!important;
+    line-height: 1.5 !important;
+  }
+  .rte ol,
+  .shopify-policy__body ol {
+    list-style: decimal !important;
+    list-style-position: inside !important;
+    padding-left: 0 !important;
+  }
+  .rte ol li,
+  .shopify-policy__body ol li {
+    padding-left: 0 !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* ═══════════════════════════════════════════
+     PRODUCT PAGE — Court Theme
+     ═══════════════════════════════════════════ */
+
+  /* ── Parchment background ── */
+  .product,
+  .product-section,
+  section[class*="main-product"],
+  .shopify-section--template--product {
+    background: var(--bg-primary) !important;
+  }
+
+  /* ── Product image area — visual only, no layout changes ── */
+  .product__media-item img {
+    border-radius: 12px !important;
+  }
+
+  /* ── Vendor / author (top overline) ── */
+  .product__text--vendor,
+  .product__vendor,
+  .product .product__text.caption-with-letter-spacing {
+    font-family: var(--font-body) !important;
+    font-size: 12.65px!important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--accent-primary) !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+  }
+
+  /* ── Product title ── */
+  .product__title,
+  .product__title h1,
+  .product__title > h1,
+  .product h1 {
+    font-family: var(--font-heading) !important;
+    font-weight: normal !important;
+    font-size: clamp(2.012rem, 3.45vw, 2.76rem)!important;
+    color: var(--text-heading) !important;
+    line-height: 1.15 !important;
+    margin: 0 0 16px !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+  }
+
+  /* ── Price block ── */
+  .price,
+  .product__price {
+    margin: 8px 0 20px !important;
+  }
+  .price-item--regular,
+  .price-item--sale,
+  .price__regular,
+  .price .money {
+    font-family: var(--font-body) !important;
+    font-size: 27.6px!important;
+    color: var(--text-heading) !important;
+    font-weight: normal !important;
+  }
+  .price-item--regular.price-item--last {
+    color: var(--text-tertiary) !important;
+    text-decoration: line-through !important;
+    font-size: 18.4px!important;
+    margin-right: 8px !important;
+  }
+  .price__sale .price-item--sale {
+    color: var(--accent-secondary) !important;
+  }
+
+  /* ── Tax / shipping notice ── */
+  .product__tax,
+  .tax-note,
+  .product .caption {
+    font-family: var(--font-body) !important;
+    font-size: 14.95px!important;
+    color: var(--text-tertiary) !important;
+    margin-top: 4px !important;
+    line-height: 1.5 !important;
+  }
+  .product__tax a,
+  .tax-note a {
+    color: var(--text-muted) !important;
+    text-decoration: underline !important;
+    text-decoration-color: var(--border-default) !important;
+    text-underline-offset: 2px !important;
+  }
+
+  /* ── Divider line between sections ── */
+  .product__info-container > hr,
+  .product__info-wrapper hr {
+    border: none !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    margin: 24px 0 !important;
+  }
+
+  /* ── Quantity label & selector ── */
+  .quantity__label,
+  .product-form__input--quantity legend,
+  .product-form__input > label {
+    font-family: var(--font-body) !important;
+    font-size: 13.8px!important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+  }
+  .quantity,
+  .product-form__quantity {
+    width: fit-content !important;
+    margin-bottom: 16px !important;
+  }
+  .quantity__input,
+  .quantity input {
+    font-family: var(--font-body) !important;
+    font-size: 18.4px!important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 8px !important;
+    background: var(--bg-elevated) !important;
+    height: 48px !important;
+  }
+  .quantity__button,
+  .quantity button {
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--bg-elevated) !important;
+    color: var(--text-muted) !important;
+    height: 48px !important;
+    width: 48px !important;
+    transition: all 0.2s !important;
+  }
+  .quantity__button:hover,
+  .quantity button:hover {
+    background: var(--bg-surface) !important;
+    color: var(--text-heading) !important;
+  }
+
+  /* ── Add to Cart button ── */
+  .product-form__submit,
+  button[name="add"] {
+    font-family: var(--font-body) !important;
+    font-size: 18.4px!important;
+    letter-spacing: 0.04em !important;
+    border-radius: 10px !important;
+    height: 56px !important;
+    padding: 0 24px !important;
+    background: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+    border: 1px solid var(--accent-primary) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+  }
+  .product-form__submit:hover,
+  button[name="add"]:hover {
+    box-shadow: 0 8px 24px rgba(221, 194, 159, 0.28) !important;
+    transform: translateY(-1px) !important;
+    background: var(--accent-primary-hover) !important;
+  }
+
+  /* Buy with Shop Pay */
+  .shopify-payment-button button {
+    border-radius: 10px !important;
+    height: 56px !important;
+    font-size: 18.4px!important;
+  }
+  .shopify-payment-button__more-options {
+    font-family: var(--font-body) !important;
+    font-size: 14.95px!important;
+    color: var(--text-muted) !important;
+    text-align: center !important;
+    margin-top: 10px !important;
+    display: block !important;
+  }
+
+  /* ── Variant selectors ── */
+  .product-form__input {
+    margin-bottom: 20px !important;
+  }
+  .product-form__input label,
+  variant-radios label {
+    font-family: var(--font-body) !important;
+    font-size: 16.1px!important;
+  }
+  /* Radio variants */
+  .product-form__input input[type="radio"] + label {
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 8px !important;
+    padding: 10px 18px !important;
+    background: var(--bg-elevated) !important;
+    color: var(--text-body) !important;
+    transition: all 0.2s !important;
+  }
+  .product-form__input input[type="radio"]:checked + label {
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-heading) !important;
+  }
+
+  /* ── Pickup availability ── */
+  .product__pickup-availabilities,
+  .pickup-availability-preview,
+  .pickup-availability-info {
+    background: var(--bg-surface) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-top: 20px !important;
+    border: 1px solid var(--border-subtle) !important;
+  }
+  .pickup-availability-preview .icon-unavailable,
+  .pickup-availability-preview .icon {
+    color: var(--accent-primary) !important;
+  }
+  .pickup-availability-preview p,
+  .pickup-availability-info p {
+    font-family: var(--font-body) !important;
+    font-size: 16.1px!important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+  }
+  .pickup-availability-preview p:first-child,
+  .pickup-availability-info p:first-child {
+    color: var(--text-heading) !important;
+    font-weight: 600 !important;
+  }
+  .pickup-availability-preview p + p,
+  .pickup-availability-info p + p {
+    color: var(--text-muted) !important;
+    margin-top: 4px !important;
+  }
+  .pickup-availability-button {
+    font-family: var(--font-body) !important;
+    font-size: 14.95px!important;
+    color: var(--accent-primary) !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px !important;
+    margin-top: 8px !important;
+    display: inline-block !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+  }
+
+  /* ── Product description ── */
+  .product__description {
+    margin-top: 32px !important;
+    padding-top: 24px !important;
+    border-top: 1px solid var(--border-subtle) !important;
+  }
+  .product__description,
+  .product__description .rte,
+  .product__description p {
+    font-family: var(--font-body) !important;
+    font-size: 18.4px!important;
+    line-height: 1.75 !important;
+    color: var(--text-body) !important;
+  }
+  .product__description p {
+    margin-bottom: 14px !important;
+  }
+  .product__description p:last-child {
+    margin-bottom: 0 !important;
+  }
+  .product__description strong,
+  .product__description b {
+    color: var(--text-heading) !important;
+    font-weight: 600 !important;
+  }
+  .product__description h2,
+  .product__description h3 {
+    font-family: var(--font-heading) !important;
+    font-weight: normal !important;
+    color: var(--text-heading) !important;
+    margin-top: 28px !important;
+    margin-bottom: 12px !important;
+    line-height: 1.25 !important;
+  }
+  .product__description h2 { font-size: 25.3px!important; }
+  .product__description h3 { font-size: 20.7px!important; }
+  .product__description ul {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 12px 0 !important;
+  }
+  .product__description ul li {
+    padding-left: 24px !important;
+    margin-bottom: 8px !important;
+    position: relative !important;
+    line-height: 1.6 !important;
+  }
+  .product__description ul li::before {
+    content: '✦' !important;
+    position: absolute !important;
+    left: 2px !important;
+    color: var(--accent-primary) !important;
+    font-size: 16.1px!important;
+    top: 4px !important;
+  }
+
+  /* ── Related products section ── */
+  .related-products h2,
+  .product-recommendations h2,
+  .complementary-products h2 {
+    font-family: var(--font-heading) !important;
+    font-weight: normal !important;
+    color: var(--text-heading) !important;
+    font-size: clamp(1.61rem, 2.875vw, 2.07rem)!important;
+  }
+
+  /* ── Sold out state ── */
+  .product-form__submit[disabled],
+  .product-form__submit:disabled {
+    background: var(--bg-surface) !important;
+    color: var(--text-tertiary) !important;
+    border-color: var(--border-subtle) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    font-family: var(--font-body) !important;
+    font-size: 12.65px!important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    border-radius: 4px !important;
+    padding: 4px 10px !important;
+  }
+  .badge--sold-out {
+    background: var(--accent-secondary) !important;
+    color: #F1E1DD !important;
+  }
+  .badge--sale {
+    background: var(--accent-primary) !important;
+    color: #F1E1DD !important;
+  }
+
+  /* ── Mobile tweaks — typography only ── */
+  @media (max-width: 768px) {
+    .product__description p { font-size: 15px !important; }
+  }
+</style>

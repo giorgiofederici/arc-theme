@@ -1,0 +1,163 @@
+/* ════════════════════════════════════════════════════════════
+   A ROMANCE COURT · Design tokens
+   The single source of truth for colour and type.
+   Sections read these variables; nothing else defines colours.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Palette: the only eight colours on the site ── */
+  --arc-plum:       #55294A;
+  --arc-plum-dark:  #371D2B;
+  --arc-navy:       #273046;
+  --arc-navy-deep:  #151D2C;
+  --arc-sand:       #DDC29F;
+  --arc-blush:      #F1E1DD;
+  --arc-lavender:   #B2AABB;
+  --arc-burgundy:   #4D3239;
+
+  /* ── Fonts ──
+     Headings: Almendra, regular weight, sentence case.
+     Body: Gentium Book Plus. Both load from the theme's own assets
+     (snippets/arc-fonts.liquid). */
+  --font-heading: "Almendra", Georgia, serif;
+  --font-body:    "Gentium Book Plus", Georgia, serif;
+  --font-heading-family: var(--font-heading);  /* read by Dawn sections */
+  --font-body-family:    var(--font-body);     /* read by Dawn sections */
+  --font-heading-weight: 400;
+  --font-heading-style:  normal;
+  --font-body-weight:    400;
+  --font-body-weight-bold: 700;
+  --font-body-style:     normal;
+
+  /* ── Light sections (default) ── */
+  --bg-primary:        var(--arc-blush);
+  --bg-elevated:       var(--arc-blush);
+  --bg-surface:        color-mix(in srgb, var(--arc-blush) 84%, var(--arc-lavender));
+  --bg-surface-hover:  color-mix(in srgb, var(--arc-blush) 70%, var(--arc-lavender));
+  --bg-dark:           var(--arc-navy);
+  --bg-dark-elevated:  var(--arc-navy-deep);
+
+  --text-heading:        var(--arc-plum);
+  --text-body:           var(--arc-plum-dark);
+  --text-muted:          var(--arc-burgundy);
+  --text-tertiary:       var(--arc-burgundy);
+  --text-on-dark:        var(--arc-blush);
+  --text-muted-on-dark:  var(--arc-lavender);
+
+  --accent-primary:        var(--arc-plum);
+  --accent-primary-hover:  var(--arc-plum-dark);
+  --accent-secondary:      var(--arc-burgundy);
+  --accent-secondary-hover:var(--arc-plum-dark);
+  --accent-glow:           var(--arc-sand);
+
+  --border-subtle:   rgba(85, 41, 74, 0.14);
+  --border-default:  rgba(85, 41, 74, 0.28);
+  --tint:            rgba(85, 41, 74, 0.06);
+  --glow:            rgba(221, 194, 159, 0.22);
+  --motif:           rgba(221, 194, 159, 0.2);
+
+  /* ── Buttons ──
+     Primary: plum with blush text. Secondary: sand gold with plum text.
+     Never white text on sand gold. */
+  --btn-primary-bg:          var(--arc-plum);
+  --btn-primary-text:        var(--arc-blush);
+  --btn-primary-border:      var(--arc-plum);
+  --btn-primary-hover-bg:    var(--arc-plum-dark);
+  --btn-secondary-bg:        var(--arc-sand);
+  --btn-secondary-text:      var(--arc-plum);
+  --btn-secondary-border:    var(--arc-sand);
+  --btn-secondary-hover-bg:  color-mix(in srgb, var(--arc-sand) 65%, var(--arc-blush));
+
+  /* ── Spacing ── */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  /* ── Radii ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── House identity colours ──
+     Used only to mark the four Houses (Houses page, initiation,
+     benefits and the footer House dots). Not for general UI. */
+  --house-emerald: #8ED4AE;
+  --house-emerald-bg: #1B3D2F;
+  --house-onyx: #B0B0B8;
+  --house-onyx-bg: #1A1A1E;
+  --house-sapphire: #89B4E4;
+  --house-sapphire-bg: #142540;
+  --house-ruby: #E47A86;
+  --house-ruby-bg: #3D1520;
+}
+
+/* ── Dark sections ──
+   The same variable names, flipped for dark backgrounds, so a section
+   never needs its own dark colours. Applies to any "--dark" variant
+   and to sections that are always dark. On dark, the sand gold
+   button leads and the second button is a blush outline. */
+.arc-dark,
+[class*="--dark"],
+.arc-footer,
+.arc-nl,
+.arc-announce,
+.arc-ticker,
+.arc-comm,
+.arc-hero,
+.arc-cal,
+.arc-merch-wrap {
+  color: var(--arc-blush);
+  --text-heading:        var(--arc-blush);
+  --text-body:           var(--arc-blush);
+  --text-muted:          var(--arc-lavender);
+  --text-tertiary:       var(--arc-lavender);
+  --accent-primary:      var(--arc-sand);
+  --accent-primary-hover:var(--arc-blush);
+  --border-subtle:       rgba(241, 225, 221, 0.12);
+  --border-default:      rgba(241, 225, 221, 0.24);
+  --bg-surface:          rgba(241, 225, 221, 0.06);
+  --bg-surface-hover:    rgba(241, 225, 221, 0.1);
+  --tint:                rgba(221, 194, 159, 0.08);
+
+  --btn-primary-bg:          var(--arc-sand);
+  --btn-primary-text:        var(--arc-plum);
+  --btn-primary-border:      var(--arc-sand);
+  --btn-primary-hover-bg:    var(--arc-blush);
+  --btn-secondary-bg:        transparent;
+  --btn-secondary-text:      var(--arc-blush);
+  --btn-secondary-border:    rgba(241, 225, 221, 0.6);
+  --btn-secondary-hover-bg:  rgba(241, 225, 221, 0.1);
+}
+
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h0, .h1, .h2, .h3, .h4, .h5 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  color: var(--text-heading);
+}

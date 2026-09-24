@@ -1,0 +1,624 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════
+  A ROMANCE COURT — Search Drawer
+  Snippet: arc-search-drawer
+  ════════════════════════════════════════════════════════════
+  Install:
+  1. Create snippet "arc-search-drawer" in Snippets, paste this file.
+  2. In theme.liquid, just before </body>, add:
+       {% render 'arc-search-drawer' %}
+  3. The existing search icon button in arc-header gets auto-wired
+     by looking for: [aria-label*="earch" i], .arc-nav__search,
+     and any <button>/<a> linking to /search.
+
+  Uses Shopify's /search/suggest.json predictive search endpoint.
+  Falls back to /search?q=... on Enter or "View all results".
+  ════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+
+<style>
+  /* ── DRAWER OVERLAY ── */
+  .arc-search-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(55, 29, 43, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .arc-search-drawer.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ── PANEL ── */
+  .arc-search-drawer__panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background:
+      radial-gradient(ellipse at 18% 12%, var(--glow) 0%, transparent 50%),
+      linear-gradient(180deg, #F1E1DD 0%, #F1E1DD 100%);
+    border-bottom: 1px solid rgba(85, 41, 74, 0.15);
+    border-radius: 0 0 24px 24px;
+    box-shadow:
+      0 12px 36px rgba(85, 41, 74, 0.10),
+      0 28px 80px rgba(85, 41, 74, 0.14);
+    padding: 2.5rem 3rem 3.5rem;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  @media (max-width: 749px) {
+    .arc-search-drawer__panel {
+      padding: 2rem 1.5rem 3rem;
+      border-radius: 0 0 18px 18px;
+    }
+  }
+  .arc-search-drawer.is-open .arc-search-drawer__panel {
+    transform: translateY(0);
+  }
+
+  .arc-search-drawer__inner {
+    max-width: 980px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── CLOSE BUTTON ── */
+  .arc-search-drawer__close {
+    position: absolute;
+    top: -16px;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    background: rgba(241, 225, 221, 0.7);
+    border: 1px solid rgba(85, 41, 74, 0.15);
+    border-radius: 50%;
+    cursor: pointer;
+    color: #55294A;
+    font-size: 1.725rem;
+    font-weight: 300;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 2;
+  }
+  .arc-search-drawer__close:hover {
+    background: #55294A;
+    color: #F1E1DD;
+    border-color: #55294A;
+    transform: scale(1.05);
+  }
+  @media (max-width: 749px) {
+    .arc-search-drawer__close {
+      top: -16px;
+      width: 40px;
+      height: 40px; font-size: 1.725rem;
+  }
+  }
+
+  /* ── EYEBROW ── */
+  .arc-search-drawer__eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.828rem;
+    letter-spacing: 0.3em;
+    color: rgba(55, 29, 43, 0.5);
+    margin: 0.5rem 0 1.75rem;
+    text-align: center;
+  }
+
+  /* ── FORM ── */
+  .arc-search-drawer__form {
+    position: relative;
+    margin: 0 auto;
+    max-width: 760px;
+    background: rgba(241, 225, 221, 0.55);
+    border: 1px solid rgba(85, 41, 74, 0.12);
+    border-radius: 999px;
+    padding: 0.5rem 0.75rem 0.5rem 1.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(85, 41, 74, 0.04);
+  }
+  .arc-search-drawer__form:focus-within {
+    background: rgba(241, 225, 221, 0.85);
+    border-color: var(--accent-primary);
+    box-shadow:
+      0 4px 16px rgba(85, 41, 74, 0.06),
+      0 0 0 4px var(--tint);
+  }
+  .arc-search-drawer__input {
+    width: 100%;
+    padding: 0.85rem 3rem 0.85rem 0;
+    background: transparent;
+    border: none;
+    font-family: var(--font-heading);
+    font-size: clamp(1.438rem, 2.875vw, 2.127rem);
+    color: #55294A;
+    outline: none;
+    box-shadow: none !important;
+  }
+  .arc-search-drawer__input::placeholder {
+    color: rgba(85, 41, 74, 0.4);
+    font-style: italic;
+    font-family: var(--font-body);
+    font-size: 0.75em;
+  }
+  .arc-search-drawer__submit {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #55294A;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #F1E1DD;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+  .arc-search-drawer__submit:hover {
+    background: var(--accent-primary);
+    transform: translateY(-50%) scale(1.05);
+  }
+  .arc-search-drawer__submit svg { width: 18px; height: 18px; }
+  @media (max-width: 749px) {
+    .arc-search-drawer__form {
+      padding: 0.4rem 0.5rem 0.4rem 1.25rem;
+    }
+    .arc-search-drawer__submit {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  /* ── HINT / STATUS ── */
+  .arc-search-drawer__hint {
+    font-family: var(--font-heading);
+    font-size: 0.805rem;
+    letter-spacing: 0.22em;
+    color: rgba(55, 29, 43, 0.45);
+    margin-top: 1.25rem;
+    text-align: center;
+  }
+
+  /* ── RESULTS ── */
+  .arc-search-drawer__results {
+    margin-top: 2.5rem;
+    display: none;
+  }
+  .arc-search-drawer__results.has-results,
+  .arc-search-drawer__results.has-loading,
+  .arc-search-drawer__results.has-empty {
+    display: block;
+  }
+
+  .arc-search-drawer__section-title {
+    font-family: var(--font-heading);
+    font-size: 0.828rem;
+    letter-spacing: 0.25em;
+    color: rgba(55, 29, 43, 0.55);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(85, 41, 74, 0.12);
+  }
+
+  /* Product grid */
+  .arc-search-drawer__products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 600px) {
+    .arc-search-drawer__products {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  .arc-search-result {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease;
+  }
+  .arc-search-result:hover { transform: translateY(-2px); }
+  .arc-search-result__media {
+    aspect-ratio: 2 / 3;
+    background: rgba(85, 41, 74, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    box-shadow:
+      0 4px 12px rgba(85, 41, 74, 0.08),
+      0 12px 28px var(--tint);
+    transition: box-shadow 0.3s;
+  }
+  .arc-search-result:hover .arc-search-result__media {
+    box-shadow:
+      0 6px 16px rgba(85, 41, 74, 0.12),
+      0 18px 40px var(--glow);
+  }
+  .arc-search-result__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .arc-search-result__title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    line-height: 1.25;
+    color: #55294A;
+    margin-bottom: 0.35rem;
+  }
+  .arc-search-result__author {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.977rem;
+    color: rgba(55, 29, 43, 0.65);
+    margin-bottom: 0.4rem;
+  }
+  .arc-search-result__price {
+    font-family: var(--font-heading);
+    font-size: 0.977rem;
+    letter-spacing: 0.08em;
+    color: var(--accent-primary);
+  }
+
+  /* Collections / pages list */
+  .arc-search-drawer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+  }
+  .arc-search-drawer__list li { margin-bottom: 0.5rem; }
+  .arc-search-drawer__list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    font-family: var(--font-body);
+    font-size: 1.208rem;
+    color: #55294A;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .arc-search-drawer__list a:hover {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+  }
+  .arc-search-drawer__list-kind {
+    font-family: var(--font-heading);
+    font-size: 0.747rem;
+    letter-spacing: 0.2em;
+    color: rgba(55, 29, 43, 0.4);
+    margin-right: 0.5rem;
+  }
+
+  /* View all link */
+  .arc-search-drawer__view-all {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.95rem 2.25rem;
+    background: #55294A;
+    color: #F1E1DD;
+    font-family: var(--font-heading);
+    font-size: 0.897rem;
+    letter-spacing: 0.22em;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: all 0.25s ease;
+  }
+  .arc-search-drawer__view-all:hover {
+    background: var(--accent-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px var(--glow);
+  }
+
+  /* Loading / empty states */
+  .arc-search-drawer__loading,
+  .arc-search-drawer__empty {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 1.208rem;
+    color: rgba(55, 29, 43, 0.55);
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .arc-search-drawer__empty-suggestion {
+    margin-top: 1rem;
+    font-style: normal;
+    font-family: var(--font-heading);
+    font-size: 0.805rem;
+    letter-spacing: 0.22em;
+    color: rgba(55, 29, 43, 0.4);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .arc-search-drawer,
+    .arc-search-drawer__panel { transition: none !important; }
+  }
+</style>
+
+<div
+  class="arc-search-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="arc-search-title"
+  aria-hidden="true"
+>
+  <div class="arc-search-drawer__panel">
+    <div class="arc-search-drawer__inner">
+
+      <button class="arc-search-drawer__close" type="button" aria-label="Close search">×</button>
+
+      <div class="arc-search-drawer__eyebrow" id="arc-search-title">Search the Court</div>
+
+      <form action="{{ routes.search_url }}" method="get" role="search" class="arc-search-drawer__form">
+        <input type="hidden" name="type" value="product,article,page,collection">
+        <input type="hidden" name="options[prefix]" value="last">
+        <input
+          type="search"
+          name="q"
+          class="arc-search-drawer__input"
+          placeholder="Books, authors, collections..."
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Search"
+        >
+        <button type="submit" class="arc-search-drawer__submit" aria-label="Submit search">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="arc-search-drawer__hint">Press Enter for all results &middot; Esc to close</div>
+
+      <div class="arc-search-drawer__results"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var drawer = document.querySelector('.arc-search-drawer');
+  if (!drawer) return;
+
+  var panel = drawer.querySelector('.arc-search-drawer__panel');
+  var input = drawer.querySelector('.arc-search-drawer__input');
+  var form = drawer.querySelector('.arc-search-drawer__form');
+  var results = drawer.querySelector('.arc-search-drawer__results');
+  var closeBtn = drawer.querySelector('.arc-search-drawer__close');
+
+  var debounceTimer;
+  var currentRequest;
+
+  // ── OPEN / CLOSE ──
+  function open() {
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { input.focus(); }, 100);
+  }
+
+  function close() {
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    input.value = '';
+    results.innerHTML = '';
+    results.className = 'arc-search-drawer__results';
+  }
+
+  // ── WIRE UP TRIGGERS ──
+  // Find every plausible search trigger anywhere on the page and bind it
+  function bindTriggers() {
+    var selectors = [
+      '.arc-nav__icon-btn[aria-label*="earch" i]',
+      '.arc-nav__icon-btn[data-search]',
+      '.arc-nav__search',
+      '[data-search-toggle]',
+      'a[href="/search"]',
+      'a[href$="/search"]',
+      'button[aria-label*="earch" i]'
+    ];
+
+    // Also catch the first .arc-nav__icon-btn that contains a magnifier SVG
+    document.querySelectorAll('.arc-nav__icon-btn').forEach(function (btn) {
+      var svg = btn.querySelector('svg');
+      if (svg && (svg.innerHTML.indexOf('circle') !== -1 && svg.innerHTML.indexOf('line') !== -1)) {
+        btn.setAttribute('data-arc-search-trigger', '');
+      }
+    });
+
+    var triggers = document.querySelectorAll(selectors.join(', ') + ', [data-arc-search-trigger]');
+    triggers.forEach(function (trigger) {
+      if (trigger.hasAttribute('data-arc-search-bound')) return;
+      trigger.setAttribute('data-arc-search-bound', '');
+      trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        open();
+      });
+    });
+
+    console.log('[arc-search] Bound', triggers.length, 'triggers');
+  }
+
+  bindTriggers();
+
+  // Re-bind if the DOM changes (e.g. section reloads in theme editor)
+  if (document.body) {
+    var observer = new MutationObserver(function () {
+      bindTriggers();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // ── CLOSE HANDLERS ──
+  closeBtn.addEventListener('click', close);
+  drawer.addEventListener('click', function (e) {
+    if (e.target === drawer) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+  });
+
+  // ── PREDICTIVE SEARCH ──
+  input.addEventListener('input', function () {
+    var q = input.value.trim();
+    clearTimeout(debounceTimer);
+
+    if (q.length < 2) {
+      results.innerHTML = '';
+      results.className = 'arc-search-drawer__results';
+      return;
+    }
+
+    debounceTimer = setTimeout(function () { runSearch(q); }, 220);
+  });
+
+  function runSearch(q) {
+    if (currentRequest) currentRequest.abort && currentRequest.abort();
+
+    results.className = 'arc-search-drawer__results has-loading';
+    results.innerHTML = '<div class="arc-search-drawer__loading">Consulting the Court…</div>';
+
+    var url = '/search/suggest.json'
+      + '?q=' + encodeURIComponent(q)
+      + '&resources[type]=product,collection,page,article'
+      + '&resources[limit]=8'
+      + '&resources[options][unavailable_products]=last'
+      + '&resources[options][fields]=title,product_type,vendor,tag';
+
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        renderResults(data.resources && data.resources.results || {}, q);
+      })
+      .catch(function (err) {
+        console.error('[arc-search] Fetch error', err);
+        results.className = 'arc-search-drawer__results has-empty';
+        results.innerHTML = '<div class="arc-search-drawer__empty">Something went amiss. <a href="/search?q=' + encodeURIComponent(q) + '" style="color:#55294A;text-decoration:underline;">Search the full site</a>.</div>';
+      });
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function formatMoney(price) {
+    if (price === undefined || price === null || price === '') return '';
+    var amount = parseFloat(price).toFixed(2);
+    return '€' + amount.replace('.', ',');
+  }
+
+  function renderResults(r, q) {
+    var products = r.products || [];
+    var collections = r.collections || [];
+    var pages = r.pages || [];
+    var articles = r.articles || [];
+
+    var total = products.length + collections.length + pages.length + articles.length;
+    if (total === 0) {
+      results.className = 'arc-search-drawer__results has-empty';
+      results.innerHTML = ''
+        + '<div class="arc-search-drawer__empty">'
+        +   'No grimoires match <em>"' + escapeHtml(q) + '"</em>.'
+        +   '<div class="arc-search-drawer__empty-suggestion">Try an author, series, or genre</div>'
+        + '</div>';
+      return;
+    }
+
+    var html = '';
+
+    // Products
+    if (products.length) {
+      html += '<div class="arc-search-drawer__section-title">Books &amp; products</div>';
+      html += '<div class="arc-search-drawer__products">';
+      products.forEach(function (p) {
+        var img = p.featured_image && p.featured_image.url ? p.featured_image.url : (p.image || '');
+        var vendor = p.vendor && p.vendor !== 'A Romance Court - Romance + Fantasy Booksellers' ? p.vendor : '';
+        html += ''
+          + '<a class="arc-search-result" href="' + escapeHtml(p.url) + '">'
+          +   '<div class="arc-search-result__media">'
+          +     (img ? '<img src="' + escapeHtml(img) + '&width=400" alt="' + escapeHtml(p.title) + '" loading="lazy">' : '')
+          +   '</div>'
+          +   '<div class="arc-search-result__title">' + escapeHtml(p.title) + '</div>'
+          +   (vendor ? '<div class="arc-search-result__author">' + escapeHtml(vendor) + '</div>' : '')
+          +   (p.price ? '<div class="arc-search-result__price">' + formatMoney(p.price) + '</div>' : '')
+          + '</a>';
+      });
+      html += '</div>';
+    }
+
+    // Collections
+    if (collections.length) {
+      html += '<div class="arc-search-drawer__section-title">Collections</div>';
+      html += '<ul class="arc-search-drawer__list">';
+      collections.forEach(function (c) {
+        html += '<li><a href="' + escapeHtml(c.url) + '">'
+          + '<span class="arc-search-drawer__list-kind">Collection</span>'
+          + escapeHtml(c.title) + '</a></li>';
+      });
+      html += '</ul>';
+    }
+
+    // Pages
+    if (pages.length) {
+      html += '<div class="arc-search-drawer__section-title">Pages</div>';
+      html += '<ul class="arc-search-drawer__list">';
+      pages.forEach(function (p) {
+        html += '<li><a href="' + escapeHtml(p.url) + '">'
+          + '<span class="arc-search-drawer__list-kind">Page</span>'
+          + escapeHtml(p.title) + '</a></li>';
+      });
+      html += '</ul>';
+    }
+
+    // Articles (blog posts)
+    if (articles.length) {
+      html += '<div class="arc-search-drawer__section-title">Journal</div>';
+      html += '<ul class="arc-search-drawer__list">';
+      articles.forEach(function (a) {
+        html += '<li><a href="' + escapeHtml(a.url) + '">'
+          + '<span class="arc-search-drawer__list-kind">Article</span>'
+          + escapeHtml(a.title) + '</a></li>';
+      });
+      html += '</ul>';
+    }
+
+    // View all CTA
+    html += '<a href="/search?q=' + encodeURIComponent(q) + '" class="arc-search-drawer__view-all">View all results</a>';
+
+    results.className = 'arc-search-drawer__results has-results';
+    results.innerHTML = html;
+  }
+
+  // Sanity log
+  console.log('[arc-search] Drawer initialised. Triggers will bind dynamically.');
+})();
+</script>

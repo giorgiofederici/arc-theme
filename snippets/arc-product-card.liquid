@@ -1,0 +1,211 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Product Card (Floating Book)
+  Snippet: arc-product-card
+  ════════════════════════════════════════════════
+  Works with both calling conventions:
+
+  Dawn default:
+  {% render 'arc-product-card',
+    card_product: product,
+    media_aspect_ratio: block.settings.image_ratio,
+    show_secondary_image: false,
+    lazy_load: false,
+    quick_add: quick_add,
+    section_id: section.id
+  %}
+
+  Simple:
+  {% render 'arc-product-card', product: product %}
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    Accept both card_product (Dawn convention) and product (simple convention)
+  endcomment
+  if card_product != blank
+    assign product = card_product
+  endif
+
+  comment
+    Bail out if no product object
+  endcomment
+  if product == blank or product == empty
+    break
+  endif
+
+  assign is_sold_out = false
+  unless product.available
+    assign is_sold_out = true
+  endunless
+
+  comment
+    Quick add — accept Dawn's quick_add param or default to true
+  endcomment
+  assign show_quick_add = true
+  if quick_add == false or quick_add == 'none'
+    assign show_quick_add = false
+  endif
+  if is_sold_out
+    assign show_quick_add = false
+  endif
+
+  comment
+    Lazy loading — accept Dawn's lazy_load param or default to true
+  endcomment
+  assign use_lazy = true
+  if lazy_load == false
+    assign use_lazy = false
+  endif
+
+  assign has_signed = false
+  assign has_spicy = false
+  assign has_limited = false
+  assign badge_type = ''
+  assign badge_label = ''
+
+  for tag in product.tags
+    assign tag_lower = tag | downcase
+    if tag_lower == 'signed'
+      assign has_signed = true
+    endif
+    if tag_lower == 'spicy'
+      assign has_spicy = true
+    endif
+    if tag_lower == 'limited'
+      assign has_limited = true
+    endif
+    if tag_lower == 'preorder'
+      assign badge_type = 'accent'
+      assign badge_label = 'Preorder'
+    endif
+    if tag_lower == 'book-box'
+      assign badge_type = 'gold'
+      assign badge_label = 'Book Box'
+    endif
+    if tag_lower == 'blind-date'
+      assign badge_type = 'rose'
+      assign badge_label = 'Blind Date'
+    endif
+    if tag_lower == 'staff-pick'
+      assign badge_type = 'gold'
+      assign badge_label = 'Staff Pick'
+    endif
+    if tag_lower == 'new-arrival'
+      assign badge_type = 'accent'
+      assign badge_label = 'New Arrival'
+    endif
+    if tag_lower == 'new'
+      assign badge_type = 'dark'
+      assign badge_label = 'New'
+    endif
+  endfor
+-%}
+
+<div class="arc-product-card{% if is_sold_out %} arc-product-card--sold-out{% endif %}">
+
+  {%- comment -%}
+    The cover is a <div> (not an <a>). A single transparent stretched link sits
+    on top of it for navigation. Interactive content (quick-add) is NO LONGER
+    nested inside an anchor — that nesting is what caused the browser to emit a
+    duplicate __display link that intercepted clicks across the whole row.
+  {%- endcomment -%}
+  <div class="arc-product-card__display">
+
+    {%- comment -%} ── Cover link (stretched over the book area) ── {%- endcomment -%}
+    <a href="{{ product.url }}" class="arc-product-card__cover-link" aria-label="{{ product.title }}"></a>
+
+    {%- comment -%} ── Badges ── {%- endcomment -%}
+    {%- if badge_label != blank or is_sold_out -%}
+      <div class="arc-product-card__badges">
+        {%- if is_sold_out -%}
+          <span class="arc-product-card__badge arc-product-card__badge--sold-out">Sold Out</span>
+        {%- endif -%}
+        {%- if badge_label != blank -%}
+          <span class="arc-product-card__badge arc-product-card__badge--{{ badge_type }}">{{ badge_label }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Floating Book ── {%- endcomment -%}
+    <div class="arc-product-card__book">
+      {%- if product.featured_image != blank -%}
+        <img
+          src="{{ product.featured_image | image_url: width: 400 }}"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          {% if use_lazy %}loading="lazy" decoding="async"{% else %}loading="eager" fetchpriority="high"{% endif %}
+        >
+      {%- else -%}
+        <div class="arc-product-card__book-placeholder">
+          {{ product.title | truncate: 30 }}
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="arc-product-card__shadow"></div>
+
+    {%- comment -%} ── Quick Add (sibling, sits above the cover link via z-index) ── {%- endcomment -%}
+    {%- if show_quick_add -%}
+      <div class="arc-product-card__quick-add">
+        {%- if product.variants.size == 1 and product.requires_selling_plan == false -%}
+          <button
+            class="arc-btn arc-btn--primary arc-btn--sm arc-btn--full arc-quick-add-btn"
+            data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+            data-product-id="{{ product.id }}"
+            {% if product.selected_or_first_available_variant.requires_selling_plan %}
+              data-selling-plan-id="{{ product.selling_plan_groups.first.selling_plans.first.id }}"
+            {% endif %}
+            {% if section_id %}data-section-id="{{ section_id }}"{% endif %}
+            type="button"
+          >
+            Quick Add <span class="arc-btn__arrow">&rarr;</span>
+          </button>
+        {%- else -%}
+          <a
+            class="arc-btn arc-btn--primary arc-btn--sm arc-btn--full"
+            href="{{ product.url }}"
+          >
+            {% if product.requires_selling_plan %}Preorder{% elsif product.variants.size > 1 %}View Options{% else %}View Product{% endif %} <span class="arc-btn__arrow">&rarr;</span>
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} ── Museum Plaque ── {%- endcomment -%}
+  <a href="{{ product.url }}" class="arc-product-card__plaque">
+      {%- assign author = product.metafields.custom.author.value -%}
+      {%- assign vendor_check = product.vendor | downcase -%}
+      {%- if author != blank -%}
+        <div class="arc-product-card__plaque-overline">{{ author }}</div>
+      {%- elsif vendor_check == 'A Romance Court' -%}
+        <div class="arc-product-card__plaque-overline">A Romance Court</div>
+      {%- endif -%}
+    <div class="arc-product-card__plaque-title">{{ product.title }}</div>
+
+    {%- if has_signed or has_spicy or has_limited -%}
+      <div class="arc-product-card__plaque-tags">
+        {%- if has_signed -%}
+          <span class="arc-product-card__tag arc-product-card__tag--signed">Signed</span>
+        {%- endif -%}
+        {%- if has_spicy -%}
+          <span class="arc-product-card__tag arc-product-card__tag--spicy">Spicy</span>
+        {%- endif -%}
+        {%- if has_limited -%}
+          <span class="arc-product-card__tag arc-product-card__tag--limited">Limited</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="arc-product-card__plaque-divider"></div>
+
+    <div class="arc-product-card__plaque-price">
+      {{ product.price | money }}
+      {%- if product.compare_at_price > product.price -%}
+        <span class="arc-product-card__plaque-price-compare">{{ product.compare_at_price | money }}</span>
+      {%- endif -%}
+    </div>
+  </a>
+</div>

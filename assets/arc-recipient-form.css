@@ -1,0 +1,239 @@
+/* ════════════════════════════════════════════════════════════
+   A ROMANCE COURT — Recipient Form (Gift Card)
+   Dedicated styles for the gift card recipient form component.
+   ════════════════════════════════════════════════════════════ */
+
+.arc-product__recipient {
+  margin: 1.5rem 0 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle, rgba(85, 41, 74, 0.14));
+}
+
+.recipient-form {
+  --recipient-checkbox-margin-top: 0.35rem;
+  display: block;
+  position: relative;
+}
+
+/* Checkbox toggle */
+.recipient-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--text-body, #371D2B);
+  user-select: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.recipient-checkbox:hover {
+  color: var(--accent-primary, #55294A);
+}
+
+.recipient-form > input[type='checkbox'] {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: var(--recipient-checkbox-margin-top) 0;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.recipient-checkbox > svg {
+  margin-top: var(--recipient-checkbox-margin-top);
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.recipient-checkbox .square-svg,
+.recipient-checkbox svg:first-child {
+  stroke: var(--border-default, rgba(85, 41, 74, 0.28));
+  fill: rgba(241, 225, 221, 0.6);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.recipient-form > input[type='checkbox']:focus-visible + label svg:first-child {
+  outline: 2px solid var(--accent-primary, #55294A);
+  outline-offset: 2px;
+}
+
+.recipient-form .icon-checkmark {
+  visibility: hidden;
+  position: absolute;
+  left: 3px;
+  top: calc(var(--recipient-checkbox-margin-top) + 3px);
+  width: 12px;
+  height: 12px;
+  fill: var(--accent-primary, #55294A);
+  z-index: 5;
+  transition: transform 0.15s ease;
+}
+
+.recipient-form > input[type='checkbox']:checked + label .icon-checkmark {
+  visibility: visible;
+}
+
+.recipient-form > input[type='checkbox']:checked + label svg:first-child {
+  stroke: var(--accent-primary, #55294A);
+  background-color: var(--tint, rgba(85, 41, 74, 0.06));
+}
+
+/* Recipient expanded fields */
+.js .recipient-fields {
+  display: none;
+}
+
+.recipient-fields hr {
+  border: 0;
+  border-top: 1px solid var(--border-subtle, rgba(85, 41, 74, 0.14));
+  margin: 1.5rem 0 1.25rem;
+}
+
+.recipient-form > input[type='checkbox']:checked ~ .recipient-fields {
+  display: block;
+  animation: arc-fade-slide 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.recipient-form > input[type='checkbox']:not(:checked, :disabled) ~ .recipient-fields,
+.recipient-email-label {
+  display: none;
+}
+
+.js .recipient-email-label.required {
+  display: inline;
+}
+
+.recipient-fields__field {
+  margin-bottom: 1.25rem;
+}
+
+/* Field Inputs in ARC style */
+.recipient-fields .field {
+  position: relative;
+  width: 100%;
+  display: flex;
+}
+
+.recipient-fields .field__input {
+  width: 100%;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 1.15rem;
+  color: var(--text-body, #371D2B);
+  background: rgba(241, 225, 221, 0.6);
+  border: 1px solid var(--border-default, rgba(85, 41, 74, 0.28));
+  border-radius: 3px;
+  padding: 1.8rem 1rem 0.6rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.recipient-fields .field__input:focus {
+  outline: none;
+  border-color: var(--accent-primary, #55294A);
+  box-shadow: 0 0 0 2px var(--tint, rgba(85, 41, 74, 0.06));
+}
+
+.recipient-fields .field__label {
+  position: absolute;
+  left: 1rem;
+  top: 1.2rem;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 1rem;
+  color: var(--text-muted, #4D3239);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.recipient-fields .field__input:focus ~ .field__label,
+.recipient-fields .field__input:not(:placeholder-shown) ~ .field__label,
+.recipient-fields .field__input:-webkit-autofill ~ .field__label {
+  top: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--accent-primary, #55294A);
+}
+
+.recipient-fields textarea.field__input {
+  min-height: 110px;
+  padding-top: 2rem;
+  resize: vertical;
+}
+
+.recipient-form-field-label {
+  display: block;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 0.85rem;
+  color: var(--text-muted, #4D3239);
+  margin-top: 0.35rem;
+}
+
+.recipient-form-field-label--space-between {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Errors & Feedback */
+.product-form__recipient-error-message-wrapper {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  background: rgba(77, 50, 57, 0.08);
+  border-left: 3px solid var(--accent-secondary, #4D3239);
+  border-radius: 3px;
+}
+
+.recipient-form .form__message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 0.95rem;
+  color: var(--accent-secondary, #4D3239);
+  margin: 0.35rem 0;
+}
+
+.recipient-form .form__message svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+.recipient-form ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.5rem;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 0.95rem;
+  color: var(--accent-secondary, #4D3239);
+}
+
+.recipient-form ul a {
+  color: var(--accent-primary, #55294A);
+  text-decoration: underline;
+}
+
+.recipient-form .error-message::first-letter {
+  text-transform: capitalize;
+}
+
+.recipient-fields__field .form__message.hidden {
+  display: none;
+}
+
+@keyframes arc-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

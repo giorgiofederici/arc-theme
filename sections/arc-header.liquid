@@ -1,0 +1,366 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Header / Navigation Bar
+  Section: arc-header
+  ════════════════════════════════════════════════
+  Mega dropdown for Shop (4 columns).
+  Simple dropdown for The Houses.
+  Both logo variants. Mobile menu overlay.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign is_dark = false
+  if section.settings.style == 'dark'
+    assign is_dark = true
+  endif
+  if is_dark and section.settings.logo_light != blank
+    assign current_logo = section.settings.logo_light
+  elsif section.settings.logo != blank
+    assign current_logo = section.settings.logo
+  else
+    assign current_logo = blank
+  endif
+-%}
+
+<header class="arc-header{% if section.settings.sticky %} arc-header--sticky{% endif %}" data-section-id="{{ section.id }}">
+  <nav class="arc-nav{% if is_dark %} arc-nav--dark{% else %} arc-nav--light{% endif %}" role="navigation" aria-label="Main navigation">
+
+    <a class="arc-nav__logo" href="{{ routes.root_url }}">
+      {%- if current_logo != blank -%}
+        <img src="{{ current_logo | image_url: width: 200 }}" alt="{{ shop.name }}" width="200" height="auto" loading="eager" class="arc-nav__logo-img">
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+
+    <div class="arc-nav__links">
+      <a class="arc-nav__link" href="{{ routes.root_url }}">Home</a>
+
+      <!-- ══ Shop — Mega Dropdown ══ -->
+      <div class="arc-nav__mega">
+        <a class="arc-nav__link" href="{{ routes.collections_url }}">Shop ▾</a>
+        <div class="arc-nav__mega-panel">
+          <div class="arc-mega__col">
+            <div class="arc-mega__col-title">Shop by type</div>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'mega_link_type' -%}
+                <a class="arc-mega__link" href="{{ block.settings.url }}">{{ block.settings.label }}{%- if block.settings.badge != blank -%}<span class="arc-mega__badge">{{ block.settings.badge }}</span>{%- endif -%}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="arc-mega__col">
+            <div class="arc-mega__col-title">Categories</div>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'mega_link_category' -%}
+                <a class="arc-mega__link" href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="arc-mega__col">
+            <div class="arc-mega__col-title">Curated picks</div>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'mega_link_curated' -%}
+                <a class="arc-mega__link{% if block.settings.highlight == 'accent' %} arc-mega__link--highlight{% elsif block.settings.highlight == 'rose' %} arc-mega__link--rose{% endif %}" href="{{ block.settings.url }}">{{ block.settings.label }}{%- if block.settings.badge != blank -%}<span class="arc-mega__badge{% if block.settings.highlight == 'rose' %} arc-mega__badge--hot{% endif %}">{{ block.settings.badge }}</span>{%- endif -%}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="arc-mega__col">
+            <div class="arc-mega__col-title">Featured</div>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'mega_featured' -%}
+                <a class="arc-mega__featured-card" href="{{ block.settings.url }}">
+                  {%- if block.settings.image != blank -%}
+                    <img class="arc-mega__featured-img" src="{{ block.settings.image | image_url: width: 300 }}" alt="{{ block.settings.title }}" loading="lazy">
+                  {%- endif -%}
+                  <div class="arc-mega__featured-body">
+                    <div class="arc-mega__featured-title">{{ block.settings.title }}</div>
+                    {%- if block.settings.subtitle != blank -%}<div class="arc-mega__featured-subtitle">{{ block.settings.subtitle }}</div>{%- endif -%}
+                    {%- if block.settings.description != blank -%}<div class="arc-mega__featured-desc">{{ block.settings.description }}</div>{%- endif -%}
+                    <div class="arc-mega__featured-cta">{{ block.settings.cta_text | default: 'Shop now →' }}</div>
+                  </div>
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ Events ══ -->
+      <a class="arc-nav__link" href="{{ section.settings.events_url }}">Events</a>
+
+      <!-- ══ The Houses — Simple Dropdown ══ -->
+      <div class="arc-nav__dropdown">
+        <a class="arc-nav__link arc-nav__link--accent" href="{{ section.settings.houses_url }}">The Houses ▾</a>
+        <div class="arc-nav__dropdown-menu" role="menu">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'houses_link' -%}
+              <a class="arc-nav__dropdown-item" href="{{ block.settings.url }}" role="menuitem">{{ block.settings.label }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+
+    <div class="arc-nav__actions">
+      {%- if section.settings.show_search -%}
+        <button class="arc-nav__icon-btn" aria-label="Search" data-action="search-open">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        </button>
+      {%- endif -%}
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <a class="arc-nav__icon-btn" href="{{ routes.account_url }}" aria-label="Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {%- endif -%}
+      <a class="arc-nav__icon-btn" href="{{ routes.cart_url }}" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        {%- if cart.item_count > 0 -%}<span class="arc-nav__cart-count">{{ cart.item_count }}</span>{%- endif -%}
+      </a>
+      <button class="arc-nav__burger" aria-label="Open menu" aria-expanded="false" data-action="mobile-menu-open">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ Mobile Menu ══ -->
+  <div class="arc-mobile-menu" id="arc-mobile-menu-{{ section.id }}" aria-hidden="true">
+    <div class="arc-mobile-menu__header">
+      <span class="arc-mobile-menu__logo">
+        {%- if section.settings.logo != blank -%}
+          <img src="{{ section.settings.logo | image_url: width: 160 }}" alt="{{ shop.name }}" width="160" height="auto">
+        {%- else -%}{{ shop.name }}{%- endif -%}
+      </span>
+      <button class="arc-mobile-menu__close" aria-label="Close menu" data-action="mobile-menu-close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="16" y2="16"/><line x1="16" y1="4" x2="4" y2="16"/></svg>
+      </button>
+    </div>
+    <nav class="arc-mobile-menu__nav" aria-label="Mobile navigation">
+      <a class="arc-mobile-menu__link" href="{{ routes.root_url }}">Home</a>
+      <a class="arc-mobile-menu__link" href="{{ routes.collections_url }}">Shop</a>
+      <div class="arc-mobile-menu__sub">
+        <div class="arc-mobile-menu__sub-heading">Shop by type</div>
+        {%- for block in section.blocks -%}{%- if block.type == 'mega_link_type' -%}
+          <a class="arc-mobile-menu__sub-link" href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+        {%- endif -%}{%- endfor -%}
+        <div class="arc-mobile-menu__sub-heading" style="margin-top:8px">Curated picks</div>
+        {%- for block in section.blocks -%}{%- if block.type == 'mega_link_curated' -%}
+          <a class="arc-mobile-menu__sub-link{% if block.settings.highlight == 'accent' %} arc-mobile-menu__sub-link--accent{% endif %}" href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+        {%- endif -%}{%- endfor -%}
+      </div>
+      <a class="arc-mobile-menu__link" href="{{ section.settings.events_url }}">Events</a>
+      <a class="arc-mobile-menu__link arc-mobile-menu__link--accent" href="{{ section.settings.houses_url }}">The Houses</a>
+      <div class="arc-mobile-menu__sub">
+        {%- for block in section.blocks -%}{%- if block.type == 'houses_link' -%}
+          <a class="arc-mobile-menu__sub-link" href="{{ block.settings.url }}">{{ block.settings.label }}</a>
+        {%- endif -%}{%- endfor -%}
+      </div>
+    </nav>
+    <div class="arc-mobile-menu__footer">{{ section.settings.mobile_footer_text }}</div>
+  </div>
+</header>
+
+<style>
+
+  .arc-header--sticky { position: sticky; top: 0; z-index: 100; }
+  .arc-nav { display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:64px;position:relative;z-index:100;border-bottom:1px solid; }
+  .arc-nav--light { background:var(--bg-elevated);border-bottom-color:var(--border-subtle); }
+  .arc-nav--dark { background:var(--bg-dark);border-bottom-color:rgba(241, 225, 221, 0.06); }
+  .arc-nav__logo { flex-shrink:0;display:flex;align-items:center;text-decoration:none; }
+  .arc-nav__logo-img { display:block;height:36px;width:auto; }
+  .arc-nav__links { display:flex;gap:24px;align-items:center; }
+  .arc-nav__link { font-family:var(--font-body);font-size:11.96px;text-decoration:none;letter-spacing:0.04em;transition:color .25s cubic-bezier(.4,0,.2,1);position:relative;padding:4px 0; }
+  .arc-nav__link::after { content:'';position:absolute;bottom:-2px;left:0;width:0;height:1.5px;transition:width .3s cubic-bezier(.4,0,.2,1); }
+  .arc-nav__link:hover::after { width:100%; }
+  .arc-nav--light .arc-nav__link { color:var(--text-muted); }
+  .arc-nav--light .arc-nav__link:hover { color:var(--text-heading); }
+  .arc-nav--light .arc-nav__link::after { background:var(--accent-primary); }
+  .arc-nav--light .arc-nav__link--accent { color:var(--accent-primary); }
+  .arc-nav--light .arc-nav__link--accent:hover { color:var(--accent-glow); }
+  .arc-nav--light .arc-nav__link--accent::after { background:var(--accent-primary); }
+  .arc-nav--dark .arc-nav__link { color:#4D3239; }
+  .arc-nav--dark .arc-nav__link:hover { color:#F1E1DD; }
+  .arc-nav--dark .arc-nav__link::after { background:var(--accent-primary); }
+  .arc-nav--dark .arc-nav__link--accent { color:var(--accent-primary); }
+  .arc-nav--dark .arc-nav__link--accent:hover { color:var(--accent-glow); }
+  .arc-nav__dropdown { position:relative;display:flex;align-items:center; }
+  .arc-nav__dropdown-menu { position:absolute;top:calc(100% + 16px);left:50%;transform:translateX(-50%) translateY(4px);border-radius:12px;padding:8px;min-width:200px;opacity:0;visibility:hidden;transition:all .25s cubic-bezier(.4,0,.2,1);z-index:200; }
+  .arc-nav__dropdown:hover .arc-nav__dropdown-menu { opacity:1;visibility:visible;transform:translateX(-50%) translateY(0); }
+  .arc-nav__dropdown-item { display:block;padding:8px 14px;font-family:var(--font-body);font-size:11.96px;text-decoration:none;border-radius:8px;transition:all .15s; }
+  .arc-nav--light .arc-nav__dropdown-menu { background:#F1E1DD;border:1px solid var(--border-subtle);box-shadow:0 8px 32px rgba(21, 29, 44, .08); }
+  .arc-nav--light .arc-nav__dropdown-item { color:var(--text-muted); }
+  .arc-nav--light .arc-nav__dropdown-item:hover { background:var(--bg-surface);color:var(--text-heading); }
+  .arc-nav--dark .arc-nav__dropdown-menu { background:#371D2B;border:1px solid rgba(241, 225, 221, .08);box-shadow:0 8px 32px rgba(21, 29, 44, .3); }
+  .arc-nav--dark .arc-nav__dropdown-item { color:#4D3239; }
+  .arc-nav--dark .arc-nav__dropdown-item:hover { background:rgba(241, 225, 221, .06);color:#F1E1DD; }
+  .arc-nav__mega { position:static;display:flex;align-items:center; }
+  .arc-nav__mega-panel { position:absolute;top:100%;left:0;right:0;padding:28px 32px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px;opacity:0;visibility:hidden;transform:translateY(4px);transition:all .3s cubic-bezier(.4,0,.2,1);z-index:200; }
+  .arc-nav__mega:hover .arc-nav__mega-panel { opacity:1;visibility:visible;transform:translateY(0); }
+  .arc-nav--light .arc-nav__mega-panel { background:#F1E1DD;border-bottom:1px solid var(--border-subtle);box-shadow:0 12px 40px rgba(21, 29, 44, .08); }
+  .arc-nav--dark .arc-nav__mega-panel { background:#371D2B;border-bottom:1px solid rgba(241, 225, 221, .06);box-shadow:0 12px 40px rgba(21, 29, 44, .4); }
+  .arc-mega__col-title { font-family:var(--font-body);font-size:10.12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid; }
+  .arc-nav--light .arc-mega__col-title { color:var(--text-tertiary);border-bottom-color:var(--border-subtle); }
+  .arc-nav--dark .arc-mega__col-title { color:#55294A;border-bottom-color:rgba(241, 225, 221, .06); }
+  .arc-mega__link { display:block;padding:6px 0;font-family:var(--font-body);font-size:12.88px;text-decoration:none;transition:color .15s;line-height:1.4; }
+  .arc-nav--light .arc-mega__link { color:var(--text-muted); }
+  .arc-nav--light .arc-mega__link:hover { color:var(--text-heading); }
+  .arc-nav--dark .arc-mega__link { color:#4D3239; }
+  .arc-nav--dark .arc-mega__link:hover { color:#F1E1DD; }
+  .arc-mega__link--highlight { font-family:var(--font-body);font-weight:500; }
+  .arc-nav--light .arc-mega__link--highlight { color:var(--accent-primary); }
+  .arc-nav--light .arc-mega__link--highlight:hover { color:var(--accent-glow); }
+  .arc-nav--dark .arc-mega__link--highlight { color:var(--accent-primary); }
+  .arc-nav--dark .arc-mega__link--highlight:hover { color:var(--accent-glow); }
+  .arc-mega__link--rose { font-family:var(--font-body); }
+  .arc-nav--light .arc-mega__link--rose { color:#55294A; }
+  .arc-nav--light .arc-mega__link--rose:hover { color:#55294A; }
+  .arc-nav--dark .arc-mega__link--rose { color:#55294A; }
+  .arc-nav--dark .arc-mega__link--rose:hover { color:#55294A; }
+  .arc-mega__badge { display:inline-block;font-family:var(--font-body);font-size:8.28px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:middle; }
+  .arc-nav--light .arc-mega__badge { background:var(--accent-primary);color:#F1E1DD; }
+  .arc-nav--dark .arc-mega__badge { background:var(--accent-primary);color:#371D2B; }
+  .arc-nav--light .arc-mega__badge--hot { background:#55294A;color:#F1E1DD; }
+  .arc-nav--dark .arc-mega__badge--hot { background:#55294A;color:#F1E1DD; }
+  .arc-mega__featured-card { display:block;text-decoration:none;border-radius:8px;overflow:hidden;transition:transform .2s; }
+  .arc-mega__featured-card:hover { transform:translateY(-2px); }
+  .arc-nav--light .arc-mega__featured-card { background:var(--bg-surface); }
+  .arc-nav--dark .arc-mega__featured-card { background:rgba(241, 225, 221, .04);border:1px solid rgba(241, 225, 221, .06); }
+  .arc-mega__featured-img { width:100%;height:100px;object-fit:cover;display:block; }
+  .arc-mega__featured-body { padding:12px 14px; }
+  .arc-mega__featured-title { font-family:var(--font-heading);font-size:14.72px;margin-bottom:2px; }
+  .arc-nav--light .arc-mega__featured-title { color:var(--text-heading); }
+  .arc-nav--dark .arc-mega__featured-title { color:#F1E1DD; }
+  .arc-mega__featured-subtitle { font-family:var(--font-body);font-size:11.04px;color:var(--accent-primary);margin-bottom:4px; }
+  .arc-mega__featured-desc { font-size:11.04px;margin-bottom:6px; }
+  .arc-nav--light .arc-mega__featured-desc { color:var(--text-tertiary); }
+  .arc-nav--dark .arc-mega__featured-desc { color:#55294A; }
+  .arc-mega__featured-cta { font-family:var(--font-body);font-size:11.04px;color:var(--accent-primary); }
+  .arc-nav__actions { display:flex;gap:8px;align-items:center;flex-shrink:0; }
+  .arc-nav__icon-btn { width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;border-radius:8px;border:none;background:none;text-decoration:none;position:relative; }
+  .arc-nav__icon-btn svg { width:20px;height:20px; }
+  .arc-nav--light .arc-nav__icon-btn { color:var(--text-muted); }
+  .arc-nav--light .arc-nav__icon-btn:hover { color:var(--text-heading);background:var(--bg-surface); }
+  .arc-nav--dark .arc-nav__icon-btn { color:#4D3239; }
+  .arc-nav--dark .arc-nav__icon-btn:hover { color:#F1E1DD;background:rgba(241, 225, 221, .06); }
+  .arc-nav__cart-count { position:absolute;top:4px;right:2px;min-width:16px;height:16px;background:var(--accent-primary);color:var(--bg-primary);font-family:var(--font-body);font-size:9.2px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600; }
+  .arc-nav__burger { display:none;width:36px;height:36px;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:8px; }
+  .arc-nav--light .arc-nav__burger { color:var(--text-muted); }
+  .arc-nav--light .arc-nav__burger:hover { color:var(--text-heading);background:var(--bg-surface); }
+  .arc-nav--dark .arc-nav__burger { color:#4D3239; }
+  .arc-nav--dark .arc-nav__burger:hover { color:#F1E1DD;background:rgba(241, 225, 221, .06); }
+  .arc-mobile-menu { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-elevated);z-index:300;padding:24px;overflow-y:auto;flex-direction:column; }
+  .arc-mobile-menu.is-open { display:flex; }
+  .arc-mobile-menu__header { display:flex;justify-content:space-between;align-items:center;margin-bottom:32px; }
+  .arc-mobile-menu__logo { font-family:var(--font-heading);font-size:14.72px;color:var(--text-heading); }
+  .arc-mobile-menu__logo img { height:28px;width:auto; }
+  .arc-mobile-menu__close { width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:var(--text-muted);cursor:pointer; }
+  .arc-mobile-menu__link { display:block;font-family:var(--font-heading);font-size:22.08px;color:var(--text-heading);text-decoration:none;padding:12px 0;border-bottom:1px solid var(--border-subtle);transition:color .2s; }
+  .arc-mobile-menu__link:hover { color:var(--accent-primary); }
+  .arc-mobile-menu__link--accent { color:var(--accent-primary); }
+  .arc-mobile-menu__sub { padding-left:16px; }
+  .arc-mobile-menu__sub-heading { font-family:var(--font-body);font-size:10.12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);padding:8px 0 4px; }
+  .arc-mobile-menu__sub-link { display:block;font-family:var(--font-body);font-size:12.88px;color:var(--text-muted);text-decoration:none;padding:6px 0;transition:color .2s; }
+  .arc-mobile-menu__sub-link:hover { color:var(--text-heading); }
+  .arc-mobile-menu__sub-link--accent { color:var(--accent-primary); }
+  .arc-mobile-menu__footer { margin-top:auto;padding-top:24px;border-top:1px solid var(--border-subtle);font-family:var(--font-body);font-size:12.88px;color:var(--text-tertiary);line-height:1.6; }
+  @media (max-width:768px) { .arc-nav__links{display:none} .arc-nav__burger{display:flex} .arc-nav{padding:0 16px} }
+</style>
+
+<script>
+  (function(){
+    var s = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!s) return;
+    var o = s.querySelector('[data-action="mobile-menu-open"]');
+    var c = s.querySelector('[data-action="mobile-menu-close"]');
+    var m = document.getElementById('arc-mobile-menu-{{ section.id }}');
+    if (o && m) {
+      o.addEventListener('click', function(){
+        m.classList.add('is-open');
+        m.setAttribute('aria-hidden', 'false');
+        o.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+    if (c && m) {
+      c.addEventListener('click', function(){
+        m.classList.remove('is-open');
+        m.setAttribute('aria-hidden', 'true');
+        if (o) o.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "section",
+  "class": "arc-section-header",
+  "settings": [
+    { "type": "select", "id": "style", "label": "Style", "options": [{ "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" }], "default": "light" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (for light background)", "info": "Dark-colored logo for the light navbar" },
+    { "type": "image_picker", "id": "logo_light", "label": "Logo (for dark background)", "info": "Light-colored logo for the dark navbar" },
+    { "type": "checkbox", "id": "sticky", "label": "Sticky on scroll", "default": true },
+    { "type": "checkbox", "id": "show_search", "label": "Show search icon", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account icon", "default": true },
+    { "type": "url", "id": "events_url", "label": "Events page URL" },
+    { "type": "url", "id": "houses_url", "label": "The Houses page URL" },
+    { "type": "textarea", "id": "mobile_footer_text", "label": "Mobile menu footer text", "default": "Carrer Monistrol, 1\nGràcia · Barcelona\nTue — Sat: 11:00 — 20:00" }
+  ],
+  "blocks": [
+    { "type": "mega_link_type", "name": "Shop: Type link", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "All Books" },
+      { "type": "url", "id": "url", "label": "URL" },
+      { "type": "text", "id": "badge", "label": "Badge text", "info": "Optional (e.g. 'New')" }
+    ]},
+    { "type": "mega_link_category", "name": "Shop: Category link", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "English Books" },
+      { "type": "url", "id": "url", "label": "URL" }
+    ]},
+    { "type": "mega_link_curated", "name": "Shop: Curated pick", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "Staff Picks" },
+      { "type": "url", "id": "url", "label": "URL" },
+      { "type": "text", "id": "badge", "label": "Badge text", "info": "Optional (e.g. 'Spring', 'Hot')" },
+      { "type": "select", "id": "highlight", "label": "Highlight style", "options": [{ "value": "none", "label": "None" }, { "value": "accent", "label": "Accent" }, { "value": "rose", "label": "Dried rose (spicy/hot)" }], "default": "none" }
+    ]},
+    { "type": "mega_featured", "name": "Shop: Featured promo", "limit": 1, "settings": [
+      { "type": "text", "id": "title", "label": "Title", "default": "March Book Box" },
+      { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Give Me Butterflies" },
+      { "type": "text", "id": "description", "label": "Description", "default": "Signed edition · Limited run" },
+      { "type": "url", "id": "url", "label": "Link URL" },
+      { "type": "text", "id": "cta_text", "label": "CTA text", "default": "Shop now →" },
+      { "type": "image_picker", "id": "image", "label": "Image", "info": "Optional promo image" }
+    ]},
+    { "type": "houses_link", "name": "Houses: Link", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "About the Houses" },
+      { "type": "url", "id": "url", "label": "URL" }
+    ]}
+  ],
+  "presets": [{
+    "name": "Header",
+    "blocks": [
+      { "type": "mega_link_type", "settings": { "label": "All Books" } },
+      { "type": "mega_link_type", "settings": { "label": "Preorders", "badge": "New" } },
+      { "type": "mega_link_type", "settings": { "label": "Monthly Book Box" } },
+      { "type": "mega_link_type", "settings": { "label": "Blind Dates with a Book" } },
+      { "type": "mega_link_type", "settings": { "label": "Merchandise" } },
+      { "type": "mega_link_category", "settings": { "label": "English Books" } },
+      { "type": "mega_link_category", "settings": { "label": "Spanish Books" } },
+      { "type": "mega_link_category", "settings": { "label": "Romance" } },
+      { "type": "mega_link_category", "settings": { "label": "Fantasy" } },
+      { "type": "mega_link_category", "settings": { "label": "Dark Romance" } },
+      { "type": "mega_link_curated", "settings": { "label": "New Arrivals", "badge": "New", "highlight": "accent" } },
+      { "type": "mega_link_curated", "settings": { "label": "Staff Picks", "highlight": "accent" } },
+      { "type": "mega_link_curated", "settings": { "label": "Heated Rivalry Series", "badge": "Hot", "highlight": "rose" } },
+      { "type": "mega_link_curated", "settings": { "label": "Signed Editions" } },
+      { "type": "mega_link_curated", "settings": { "label": "Gift Ideas" } },
+      { "type": "mega_featured", "settings": { "title": "March Book Box", "subtitle": "Give Me Butterflies", "description": "Signed edition · Limited run", "cta_text": "Shop now →" } },
+      { "type": "houses_link", "settings": { "label": "About the Houses" } },
+      { "type": "houses_link", "settings": { "label": "Benefits" } },
+      { "type": "houses_link", "settings": { "label": "House Standings" } },
+      { "type": "houses_link", "settings": { "label": "Join / Initiation" } }
+    ]
+  }]
+}
+{% endschema %}

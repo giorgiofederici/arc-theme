@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "arc-collections-list",
+      "settings": {
+        "overline": "Browse Our Shelves",
+        "heading": "Collections",
+        "description": "Curated shelves for every reader. From Romantasy to Dark Romance, find your next story.",
+        "products_per_carousel": 8
+      }
+    }
+  },
+  "order": ["main"]
+}

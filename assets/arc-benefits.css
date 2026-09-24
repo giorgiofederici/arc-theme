@@ -1,0 +1,431 @@
+/* ═══════════════════════════════════════════
+   arc-benefits.css
+   A Romance Court — House Membership Benefits
+   
+   Upload to: assets/arc-benefits.css
+   Uses same design tokens as arc-global.css & houses.css
+   ═══════════════════════════════════════════ */
+
+/* ── LAYOUT ── */
+.arc-benefits {
+  position: relative;
+  overflow: hidden;
+  background: var(--arc-bg);
+  color: var(--arc-blush);
+}
+/* Catch-all: ensure ALL text uses brand fonts */
+.arc-benefits p,
+.arc-benefits li,
+.arc-benefits span:not(.pack-icon):not(.priv-icon):not(.arc-init-icon):not(.sol-icon):not(.card-icon):not(.dot):not(.arc-points-footer-icon) {
+  font-family: var(--font-body);
+}
+.arc-benefits::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(85, 41, 74, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(85, 41, 74, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+.arc-benefits section { position: relative; z-index: 1; }
+
+/* ── HERO ── */
+#arc-benefits-hero {
+  text-align: center;
+  padding: 120px 24px 90px;
+  position: relative;
+}
+#arc-benefits-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--arc-sand));
+  opacity: 0.3;
+}
+
+.arc-benefits h1 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  letter-spacing: 0.06em;
+  color: var(--arc-blush);
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+
+.arc-hero-verse {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.9rem;
+  color: rgba(241, 225, 221, 0.55);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── EYEBROW (reuses existing class from houses.css) ── */
+.arc-benefits .arc-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--arc-sand);
+  margin-bottom: 24px;
+  display: block;
+}
+
+/* ── ORNAMENT DIVIDER (reuses existing class) ── */
+.arc-benefits .arc-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 0;
+  margin: 0 auto;
+  max-width: 200px;
+  position: relative;
+  z-index: 1;
+}
+.arc-benefits .arc-ornament span {
+  flex: 1;
+  height: 1px;
+  background: rgba(221, 194, 159, 0.12);
+}
+.arc-benefits .arc-ornament .dot {
+  font-size: 1.5rem;
+  color: var(--arc-sand);
+  opacity: 0.5;
+  flex: none;
+}
+
+/* ── SECTION PATTERN ── */
+.arc-ben-section {
+  padding: 80px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.arc-ben-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.arc-ben-header h2 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 0.06em;
+  color: var(--arc-blush);
+  line-height: 1.2;
+  margin-top: 20px;
+}
+.arc-ben-header p {
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  color: rgba(241, 225, 221, 0.7);
+  max-width: 560px;
+  margin: 16px auto 0;
+}
+
+/* ── INITIATION BLOCK ── */
+.arc-initiation-block {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.arc-initiation-block .arc-init-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 24px;
+  opacity: 0.85;
+}
+.arc-initiation-block p {
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  color: rgba(241, 225, 221, 0.7);
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+.arc-initiation-block .arc-emphasis {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--arc-sand);
+  display: block;
+  margin-top: 24px;
+}
+
+/* ── HOUSE PACK ── */
+.arc-pack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.arc-pack-item {
+  border: 1px solid rgba(221, 194, 159, 0.12);
+  padding: 32px 28px;
+  text-align: center;
+  transition: border-color 0.4s ease;
+}
+.arc-pack-item:hover {
+  border-color: rgba(221, 194, 159, 0.25);
+}
+.arc-pack-item .pack-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 14px;
+}
+.arc-pack-item h4 {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--arc-blush);
+  margin-bottom: 8px;
+}
+.arc-pack-item p {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.55);
+  line-height: 1.5;
+}
+
+/* ── PRIVILEGES GRID ── */
+.arc-priv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.arc-priv-card {
+  border: 1px solid rgba(221, 194, 159, 0.12);
+  padding: 32px 28px;
+  transition: border-color 0.4s ease, transform 0.3s ease;
+}
+.arc-priv-card:hover {
+  border-color: rgba(221, 194, 159, 0.25);
+  transform: translateY(-2px);
+}
+.arc-priv-card .priv-icon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+.arc-priv-card h4 {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--arc-blush);
+  margin-bottom: 10px;
+}
+.arc-priv-card p {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.7);
+  line-height: 1.6;
+}
+
+/* ── TRAVELING BOOK ── */
+.arc-traveling-intro {
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto 56px;
+}
+.arc-traveling-intro p {
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  color: rgba(241, 225, 221, 0.7);
+  line-height: 1.75;
+}
+
+.arc-traveling-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.arc-traveling-card {
+  border: 1px solid rgba(221, 194, 159, 0.12);
+  padding: 36px 32px;
+}
+.arc-traveling-card h3 {
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--arc-sand);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(221, 194, 159, 0.12);
+}
+.arc-traveling-card .card-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 16px;
+}
+.arc-traveling-card p {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.7);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.arc-traveling-card ul {
+  list-style: none;
+  padding: 0;
+}
+.arc-traveling-card ul li {
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.7);
+  padding: 8px 0 8px 16px;
+  border-bottom: 1px solid rgba(221, 194, 159, 0.06);
+  position: relative;
+}
+.arc-traveling-card ul li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--arc-sand);
+  opacity: 0.5;
+}
+.arc-traveling-card ul li:last-child { border-bottom: none; }
+
+.arc-traveling-card .card-legacy {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.6rem;
+  color: var(--arc-sand);
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(221, 194, 159, 0.12);
+}
+
+.arc-court-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 12px 0;
+}
+.arc-court-tag {
+  font-size: 1.6rem;
+  color: rgba(241, 225, 221, 0.55);
+  border: 1px solid rgba(221, 194, 159, 0.08);
+  padding: 4px 12px;
+  font-family: var(--font-body);
+}
+
+/* ── SOLSTICE ── */
+.arc-solstice-block {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 48px 32px;
+  border: 1px solid rgba(221, 194, 159, 0.12);
+}
+.arc-solstice-block .sol-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 20px;
+}
+.arc-solstice-block h3 {
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--arc-sand);
+  margin-bottom: 16px;
+}
+.arc-solstice-block p {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.7);
+  line-height: 1.7;
+}
+.arc-solstice-block .sol-emphasis {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--arc-sand);
+  font-size: 1.8rem;
+  display: block;
+  margin-top: 16px;
+}
+
+/* ── CTA ── */
+#arc-benefits-cta {
+  text-align: center;
+  padding: 100px 24px 120px;
+  position: relative;
+  z-index: 1;
+}
+#arc-benefits-cta h2 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.06em;
+  color: var(--arc-blush);
+  margin-bottom: 32px;
+}
+.arc-benefits .arc-btn-primary {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--arc-bg);
+  background: var(--arc-sand);
+  border: 1px solid var(--arc-sand);
+  padding: 18px 48px;
+  transition: all 0.35s ease;
+}
+.arc-benefits .arc-btn-primary:hover {
+  background: transparent;
+  color: var(--arc-sand);
+}
+.arc-cta-subtext {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.5rem;
+  color: rgba(241, 225, 221, 0.55);
+  margin-top: 16px;
+}
+
+/* ── REVEAL ANIMATIONS (same as houses page) ── */
+.arc-benefits .arc-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.arc-benefits .arc-reveal.arc-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.arc-benefits .arc-reveal:nth-child(2) { transition-delay: 0.08s; }
+.arc-benefits .arc-reveal:nth-child(3) { transition-delay: 0.16s; }
+.arc-benefits .arc-reveal:nth-child(4) { transition-delay: 0.24s; }
+.arc-benefits .arc-reveal:nth-child(5) { transition-delay: 0.32s; }
+.arc-benefits .arc-reveal:nth-child(6) { transition-delay: 0.40s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .arc-traveling-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .arc-pack-grid { grid-template-columns: 1fr; }
+  .arc-ben-section { padding: 56px 20px; }
+  #arc-benefits-hero { padding: 80px 20px 60px; }
+  .arc-solstice-block { padding: 36px 24px; }
+  .arc-traveling-card { padding: 28px 24px; }
+}

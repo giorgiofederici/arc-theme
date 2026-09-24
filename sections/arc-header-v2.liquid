@@ -1,0 +1,1027 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Header v2
+  Section: arc-header-v2
+  ════════════════════════════════════════════════
+  Every label and link comes from a navigation menu
+  (Content → Menus), so nothing is written into the code
+  and Translate & Adapt can reach all of it.
+
+  Menu depth:
+    level 1  → the items in the bar
+    level 2  → a column heading, or a plain link
+    level 3  → the links under a column heading
+
+  Optional blocks add an intro line or a featured card
+  to one top-level item, matched by its exact name.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign is_dark = false
+  assign is_plum = false
+  if section.settings.style != 'light'
+    assign is_dark = true
+  endif
+  if section.settings.style == 'plum'
+    assign is_plum = true
+  endif
+  if is_dark and section.settings.logo_light != blank
+    assign current_logo = section.settings.logo_light
+  elsif section.settings.logo != blank
+    assign current_logo = section.settings.logo
+  else
+    assign current_logo = blank
+  endif
+  assign menu = linklists[section.settings.menu]
+  assign logo_h = section.settings.logo_height | default: 140
+  assign logo_style = 'height:' | append: logo_h | append: 'px;width:auto'
+  assign logo_src_h = logo_h | times: 2
+-%}
+
+<header
+  class="archv{% if section.settings.sticky %} archv--sticky{% endif %}{% if is_dark %} archv--dark{% endif %}{% if is_plum %} archv--plum{% endif %}{% if section.settings.logo_overhang %} archv--overhang{% endif %}"
+  style="--archv-logo-h: {{ logo_h }}px"
+  data-section-id="{{ section.id }}"
+>
+  <nav class="archv__bar" aria-label="Main navigation">
+    <a class="archv__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+      {%- if current_logo != blank -%}
+        {{
+          current_logo
+          | image_url: height: logo_src_h
+          | image_tag: loading: 'eager', class: 'archv__logo-img', alt: shop.name, style: logo_style
+        }}
+      {%- else -%}
+        <span class="archv__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    {%- if menu != blank and menu.links.size > 0 -%}
+      <ul class="archv__items">
+        {%- for link in menu.links -%}
+          {%- liquid
+            assign has_panel = false
+            if link.links.size > 0
+              assign has_panel = true
+            endif
+            assign key = link.title | downcase | strip
+            assign intro = blank
+            assign feature = blank
+            for block in section.blocks
+              assign block_key = block.settings.menu_item | downcase | strip
+              if block_key == key
+                if block.type == 'panel_intro'
+                  assign intro = block
+                elsif block.type == 'panel_feature'
+                  assign feature = block
+                endif
+              endif
+            endfor
+            if feature != blank
+              assign has_panel = true
+            endif
+            assign panel_id = 'archv-panel-' | append: section.id | append: '-' | append: forloop.index
+          -%}
+
+          <li class="archv__item{% if has_panel %} archv__item--has-panel{% endif %}">
+            {%- if has_panel -%}
+              <button
+                class="archv__link"
+                type="button"
+                aria-expanded="false"
+                aria-controls="{{ panel_id }}"
+                data-archv-toggle
+              >
+                {{ link.title }}
+                <svg class="archv__caret" viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>
+              </button>
+
+              <div class="archv__panel" id="{{ panel_id }}" data-archv-panel hidden>
+                <div class="archv__panel-inner">
+                  {%- if intro != blank and intro.settings.text != blank -%}
+                    <p class="archv__intro">{{ intro.settings.text }}</p>
+                  {%- endif -%}
+
+                  <div class="archv__cols">
+                    {%- assign plain_links = '' -%}
+                    {%- for child in link.links -%}
+                      {%- if child.links.size > 0 -%}
+                        <div class="archv__col">
+                          {%- if child.url != blank and child.url != '#' -%}
+                            <a class="archv__col-title archv__col-title--link" href="{{ child.url }}">{{ child.title }}</a>
+                          {%- else -%}
+                            <p class="archv__col-title">{{ child.title }}</p>
+                          {%- endif -%}
+                          {%- for grandchild in child.links -%}
+                            {%- render 'arc-header-link',
+                              link: grandchild,
+                              blocks: section.blocks,
+                              class: 'archv__col-link'
+                            -%}
+                          {%- endfor -%}
+                        </div>
+                      {%- else -%}
+                        {%- assign plain_links = plain_links | append: forloop.index | append: ',' -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+
+                    {%- if plain_links != blank -%}
+                      <div class="archv__col archv__col--plain">
+                        {%- for child in link.links -%}
+                          {%- unless child.links.size > 0 -%}
+                            {%- render 'arc-header-link',
+                              link: child,
+                              blocks: section.blocks,
+                              class: 'archv__col-link'
+                            -%}
+                          {%- endunless -%}
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+
+                    {%- if feature != blank -%}
+                      <a class="archv__feature" href="{{ feature.settings.url }}">
+                        {%- if feature.settings.image != blank -%}
+                          {{
+                            feature.settings.image
+                            | image_url: width: 600
+                            | image_tag: loading: 'lazy', class: 'archv__feature-img', alt: feature.settings.title
+                          }}
+                        {%- endif -%}
+                        <span class="archv__feature-body">
+                          {%- if feature.settings.eyebrow != blank -%}
+                            <span class="archv__feature-eyebrow">{{ feature.settings.eyebrow }}</span>
+                          {%- endif -%}
+                          <span class="archv__feature-title">{{ feature.settings.title }}</span>
+                          {%- if feature.settings.subtitle != blank -%}
+                            <span class="archv__feature-subtitle">{{ feature.settings.subtitle }}</span>
+                          {%- endif -%}
+                          {%- if feature.settings.text != blank -%}
+                            <span class="archv__feature-text">{{ feature.settings.text }}</span>
+                          {%- endif -%}
+                          {%- if feature.settings.cta != blank -%}
+                            <span class="archv__feature-cta">{{ feature.settings.cta }}</span>
+                          {%- endif -%}
+                        </span>
+                      </a>
+                    {%- endif -%}
+                  </div>
+
+                  {%- if section.settings.show_see_all and link.url != blank and link.url != '#' -%}
+                    <a class="archv__panel-all" href="{{ link.url }}">{{ link.title }} &rarr;</a>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- else -%}
+              <a class="archv__link" href="{{ link.url }}">{{ link.title }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="archv__setup">
+        Choose a navigation menu for this header in the theme editor.
+      </p>
+    {%- endif -%}
+
+    <div class="archv__actions">
+      {%- if section.settings.show_search -%}
+        <button class="archv__icon" type="button" aria-label="Search" data-search-toggle>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+        </button>
+      {%- endif -%}
+
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <a class="archv__icon archv__icon--desktop" href="{{ routes.account_url }}" aria-label="{{ 'customer.account.title' | t | default: 'Account' }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_language and localization.available_languages.size > 1 -%}
+        {%- form 'localization', class: 'archv__lang archv__lang--desktop' -%}
+          <input type="hidden" name="return_to" value="{{ request.path }}">
+          {%- for language in localization.available_languages -%}
+            <button
+              class="archv__lang-btn"
+              type="submit"
+              name="language_code"
+              value="{{ language.iso_code }}"
+              lang="{{ language.iso_code }}"
+              {% if language.iso_code == localization.language.iso_code %}
+                aria-current="true"
+              {% endif %}
+            >
+              {{- language.iso_code | upcase -}}
+            </button>
+          {%- endfor -%}
+        {%- endform -%}
+      {%- endif -%}
+
+      <a class="archv__icon" href="{{ routes.cart_url }}" aria-label="{{ 'templates.cart.cart' | t | default: 'Cart' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+        {%- if cart.item_count > 0 -%}
+          <span class="archv__cart-count">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+
+      <button
+        class="archv__icon archv__burger"
+        type="button"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="archv-drawer-{{ section.id }}"
+        data-archv-burger
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  {%- comment -%} ══ Mobile menu: the same menu, as accordions ══ {%- endcomment -%}
+  <div class="archv__drawer" id="archv-drawer-{{ section.id }}" data-archv-drawer hidden>
+    <div class="archv__drawer-top">
+      <a class="archv__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+        {%- if section.settings.logo != blank -%}
+          {{
+            section.settings.logo
+            | image_url: height: 96
+            | image_tag: loading: 'lazy', class: 'archv__logo-img', alt: shop.name, style: 'height:34px;width:auto'
+          }}
+        {%- else -%}
+          <span class="archv__logo-text">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+      <button class="archv__icon" type="button" aria-label="Close" data-archv-close>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    {%- if section.settings.show_language and localization.available_languages.size > 1 -%}
+      {%- form 'localization', class: 'archv__lang archv__lang--drawer' -%}
+        <input type="hidden" name="return_to" value="{{ request.path }}">
+        {%- for language in localization.available_languages -%}
+          <button
+            class="archv__lang-btn"
+            type="submit"
+            name="language_code"
+            value="{{ language.iso_code }}"
+            lang="{{ language.iso_code }}"
+            {% if language.iso_code == localization.language.iso_code %}
+              aria-current="true"
+            {% endif %}
+          >
+            {{- language.endonym_name -}}
+          </button>
+        {%- endfor -%}
+      {%- endform -%}
+    {%- endif -%}
+
+    <nav class="archv__drawer-nav" aria-label="Mobile navigation">
+      {%- for link in menu.links -%}
+        {%- liquid
+          assign key = link.title | downcase | strip
+          assign intro = blank
+          for block in section.blocks
+            assign block_key = block.settings.menu_item | downcase | strip
+            if block_key == key and block.type == 'panel_intro'
+              assign intro = block
+            endif
+          endfor
+          assign acc_id = 'archv-acc-' | append: section.id | append: '-' | append: forloop.index
+        -%}
+        <div class="archv__acc">
+          {%- if link.links.size > 0 -%}
+            <button class="archv__acc-head" type="button" aria-expanded="false" aria-controls="{{ acc_id }}" data-archv-acc>
+              {{ link.title }}
+              <svg class="archv__caret" viewBox="0 0 10 10" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5"/></svg>
+            </button>
+            <div class="archv__acc-body" id="{{ acc_id }}" hidden>
+              {%- if intro != blank and intro.settings.text != blank -%}
+                <p class="archv__acc-intro">{{ intro.settings.text }}</p>
+              {%- endif -%}
+              {%- for child in link.links -%}
+                {%- if child.links.size > 0 -%}
+                  {%- if child.url != blank and child.url != '#' -%}
+                    <a class="archv__acc-title archv__acc-title--link" href="{{ child.url }}">{{ child.title }}</a>
+                  {%- else -%}
+                    <p class="archv__acc-title">{{ child.title }}</p>
+                  {%- endif -%}
+                  {%- for grandchild in child.links -%}
+                    {%- render 'arc-header-link',
+                      link: grandchild,
+                      blocks: section.blocks,
+                      class: 'archv__acc-link'
+                    -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- render 'arc-header-link', link: child, blocks: section.blocks, class: 'archv__acc-link' -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if section.settings.show_see_all and link.url != blank and link.url != '#' -%}
+                <a class="archv__acc-all" href="{{ link.url }}">{{ link.title }} &rarr;</a>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <a class="archv__acc-head" href="{{ link.url }}">{{ link.title }}</a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <div class="archv__acc">
+          <a class="archv__acc-head" href="{{ routes.account_url }}">
+            {{- 'customer.account.title' | t | default: 'Account' -}}
+          </a>
+        </div>
+      {%- endif -%}
+    </nav>
+
+    {%- if section.settings.drawer_footer != blank -%}
+      <div class="archv__drawer-foot">{{ section.settings.drawer_footer }}</div>
+    {%- endif -%}
+  </div>
+</header>
+
+<style>
+  .archv {
+    position: relative;
+    z-index: 100;
+    overflow: visible;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .archv--sticky { position: sticky; top: 0; }
+  .archv--dark {
+    background: var(--bg-dark);
+    border-bottom-color: rgba(241, 225, 221, 0.12);
+    color: var(--arc-blush);
+    --text-heading: var(--arc-blush);
+    --text-body: var(--arc-blush);
+    --text-muted: var(--arc-lavender);
+    --accent-primary: var(--arc-sand);
+    --border-subtle: rgba(241, 225, 221, 0.12);
+    --bg-elevated: var(--bg-dark);
+    --bg-surface: rgba(241, 225, 221, 0.08);
+  }
+
+  .archv--plum {
+    background: var(--arc-plum);
+    border-bottom-color: rgba(241, 225, 221, 0.16);
+    --bg-elevated: var(--arc-plum);
+    --bg-dark: var(--arc-plum);
+    --bg-surface: rgba(241, 225, 221, 0.09);
+    --border-subtle: rgba(241, 225, 221, 0.18);
+  }
+
+  .archv__bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 28px;
+    min-height: 76px;
+  }
+  .archv__logo { flex-shrink: 0; display: flex; align-items: center; text-decoration: none; color: inherit; }
+  .archv__logo-img { display: block; }
+  .archv__logo-text { font-family: var(--font-heading); font-size: 22px; color: var(--text-heading); }
+
+  .archv__items {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    min-height: 76px;
+  }
+
+  /* Desktop: the menu is centred on the bar, whatever the logo's width */
+  @media screen and (min-width: 990px) {
+    .archv__bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+    .archv__logo { grid-column: 1; justify-self: start; }
+    .archv__items { grid-column: 2; justify-self: center; margin: 0; }
+    .archv__actions { grid-column: 3; justify-self: end; margin-left: 0; }
+
+    /* Large logo hanging over the bar's edges, like a stamped seal.
+       Both outer columns keep the same minimum width, so the menu stays
+       centred on the bar however tall the logo is. */
+    .archv--overhang .archv__bar {
+      grid-template-columns:
+        minmax(calc(var(--archv-logo-h, 140px) + 24px), 1fr)
+        auto
+        minmax(calc(var(--archv-logo-h, 140px) + 24px), 1fr);
+    }
+    .archv--overhang .archv__logo {
+      grid-column: auto;
+      position: absolute;
+      left: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 210;
+    }
+    .archv--overhang .archv__panel-inner {
+      padding-top: calc((var(--archv-logo-h, 140px) - 76px) / 2 + 32px);
+    }
+  }
+  .archv__item { position: static; display: flex; align-items: center; }
+  .archv__link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: var(--text-body);
+    background: none;
+    border: 0;
+    padding: 10px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    position: relative;
+  }
+  .archv__link::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 6px;
+    height: 1.5px;
+    background: var(--accent-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .archv__link:hover::after,
+  .archv__link[aria-expanded='true']::after { transform: scaleX(1); }
+  .archv__link:hover { color: var(--text-heading); }
+  .archv__caret { transition: transform 0.2s; }
+  .archv__link[aria-expanded='true'] .archv__caret { transform: rotate(180deg); }
+
+  .archv__setup { margin: 0 auto; font-size: 14px; color: var(--text-muted); }
+
+  .archv__actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto; }
+  .archv__icon {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: var(--text-body);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+  }
+  .archv__icon svg { width: 20px; height: 20px; }
+  .archv__icon:hover { color: var(--text-heading); }
+  .archv__cart-count {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 999px;
+    background: var(--accent-primary);
+    color: var(--bg-elevated);
+    font-family: var(--font-body);
+    font-size: 11px;
+    line-height: 17px;
+    text-align: center;
+    padding: 0 4px;
+  }
+  .archv--dark .archv__cart-count { color: var(--arc-plum); }
+
+  .archv__lang { display: flex; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin: 0 6px; }
+  .archv__lang-btn {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    background: none;
+    border: 0;
+    color: var(--text-muted);
+    padding: 6px 9px;
+    cursor: pointer;
+  }
+  .archv__lang-btn[aria-current='true'] { background: var(--bg-surface); color: var(--text-heading); }
+
+  /* ── Panels ── */
+  .archv__panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+    box-shadow: 0 24px 40px -24px rgba(21, 29, 44, 0.35);
+    z-index: 200;
+  }
+  .archv__panel[hidden] { display: none; }
+  .archv__panel-inner { padding: 32px 40px 36px; }
+  .archv__intro { margin: 0 0 22px; max-width: 62ch; font-size: 17px; color: var(--text-heading); }
+  .archv__cols { display: flex; flex-wrap: wrap; gap: 44px; align-items: flex-start; }
+  .archv__col { min-width: 170px; flex: 1 1 170px; }
+  .archv__col--plain { display: flex; flex-direction: column; }
+  .archv__col-title {
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .archv__col-title--link { display: block; text-decoration: none; }
+  .archv__col-title--link:hover { color: var(--text-heading); }
+  .archv__acc-title--link { display: block; text-decoration: none; }
+
+  .archv__col-link,
+  .archv__panel-all {
+    display: block;
+    text-decoration: none;
+    color: var(--text-body);
+    font-size: 17px;
+    padding: 8px 0;
+    line-height: 1.35;
+  }
+  .archv__col-link:hover,
+  .archv__panel-all:hover {
+    color: var(--text-heading);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--accent-primary);
+  }
+  .archv__panel-all { color: var(--accent-primary); font-size: 14px; letter-spacing: 0.06em; }
+
+  /* Highlighted links and badges */
+  .archv__col-link--accent,
+  .archv__acc-link--accent { color: var(--accent-primary); }
+  .archv__badge {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 7px;
+    vertical-align: middle;
+    background: var(--accent-primary);
+    color: var(--bg-elevated);
+  }
+  .archv--dark .archv__badge { color: var(--arc-plum); }
+  .archv__badge--hot { background: var(--arc-plum); color: var(--arc-blush); }
+  .archv--dark .archv__badge--hot { background: var(--arc-blush); color: var(--arc-plum); }
+  .archv__panel-all { margin-top: 18px; }
+
+  .archv__feature {
+    flex: 0 1 330px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    color: var(--text-body);
+  }
+  .archv__feature-img { width: 100%; height: 165px; object-fit: cover; display: block; }
+  .archv__feature-body { display: block; padding: 18px 20px 20px; }
+  .archv__feature-eyebrow {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+  }
+  .archv__feature-title { display: block; font-family: var(--font-heading); font-size: 24px; color: var(--text-heading); margin: 2px 0 6px; line-height: 1.15; }
+  .archv__feature-subtitle { display: block; font-size: 16px; color: var(--text-body); margin-bottom: 4px; line-height: 1.4; }
+  .archv__feature-text { display: block; font-size: 15px; line-height: 1.45; color: var(--text-muted); }
+  .archv__feature-cta { display: block; margin-top: 12px; font-size: 15px; color: var(--accent-primary); }
+
+  /* ── Mobile drawer ── */
+  .archv__burger { display: none; }
+  .archv__drawer { display: none; }
+
+  @media screen and (max-width: 989px) {
+    .archv__bar { padding: 0 14px; min-height: 62px; gap: 8px; }
+    .archv__items,
+    .archv__icon--desktop,
+    .archv__lang--desktop,
+    .archv__setup { display: none; }
+    .archv__burger { display: grid; }
+    .archv__logo-img { height: 34px !important; }
+
+    .archv__drawer {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: var(--bg-elevated);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .archv__drawer[hidden] { display: none; }
+    .archv--dark .archv__drawer { background: var(--bg-dark); }
+    .archv__drawer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .archv__lang--drawer { align-self: flex-start; margin: 14px 18px 4px; }
+    .archv__lang--drawer .archv__lang-btn { padding: 8px 14px; font-size: 13px; }
+    .archv__drawer-nav { padding: 4px 18px 24px; }
+    .archv__acc { border-bottom: 1px solid var(--border-subtle); }
+    .archv__acc-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: none;
+      border: 0;
+      padding: 16px 0;
+      font-family: var(--font-heading);
+      font-size: 22px;
+      color: var(--text-heading);
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .archv__acc-body { padding-bottom: 14px; }
+    .archv__acc-body[hidden] { display: none; }
+    .archv__acc-intro { margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: var(--text-muted); }
+    .archv__acc-title {
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 12px 0 2px;
+    }
+    .archv__acc-link,
+    .archv__acc-all { display: block; padding: 8px 0; font-size: 16px; color: var(--text-body); text-decoration: none; }
+    .archv__acc-all { color: var(--accent-primary); font-size: 14px; letter-spacing: 0.06em; }
+    .archv__drawer-foot { margin-top: auto; padding: 20px 18px 28px; font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .archv__link::after,
+    .archv__caret { transition: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-section-id="{{ section.id }}"]');
+    if (!root) return;
+
+    var items = root.querySelectorAll('.archv__item--has-panel');
+    var openTimer;
+
+    function closeAll(except) {
+      items.forEach(function (item) {
+        if (item === except) return;
+        var btn = item.querySelector('[data-archv-toggle]');
+        var panel = item.querySelector('[data-archv-panel]');
+        if (!btn || !panel) return;
+        btn.setAttribute('aria-expanded', 'false');
+        panel.hidden = true;
+      });
+    }
+
+    function setOpen(item, open) {
+      var btn = item.querySelector('[data-archv-toggle]');
+      var panel = item.querySelector('[data-archv-panel]');
+      if (!btn || !panel) return;
+      if (open) closeAll(item);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.hidden = !open;
+    }
+
+    var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    items.forEach(function (item) {
+      var btn = item.querySelector('[data-archv-toggle]');
+      if (!btn) return;
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(item, btn.getAttribute('aria-expanded') !== 'true');
+      });
+
+      if (canHover) {
+        item.addEventListener('mouseenter', function () {
+          clearTimeout(openTimer);
+          openTimer = setTimeout(function () {
+            setOpen(item, true);
+          }, 80);
+        });
+      }
+
+      btn.addEventListener('focus', function () {
+        if (canHover) setOpen(item, true);
+      });
+    });
+
+    if (canHover) {
+      root.addEventListener('mouseleave', function () {
+        clearTimeout(openTimer);
+        openTimer = setTimeout(function () {
+          closeAll(null);
+        }, 160);
+      });
+      root.addEventListener('mouseenter', function () {
+        clearTimeout(openTimer);
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!root.contains(e.target)) closeAll(null);
+    });
+
+    root.addEventListener('focusout', function (e) {
+      if (!root.contains(e.relatedTarget)) closeAll(null);
+    });
+
+    // ── Mobile drawer ──
+    var burger = root.querySelector('[data-archv-burger]');
+    var drawer = root.querySelector('[data-archv-drawer]');
+    var closeBtn = root.querySelector('[data-archv-close]');
+
+    function setDrawer(open) {
+      if (!drawer || !burger) return;
+      drawer.hidden = !open;
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+      if (open && closeBtn) closeBtn.focus();
+      if (!open) burger.focus();
+    }
+
+    if (burger) {
+      burger.addEventListener('click', function () {
+        setDrawer(drawer.hidden);
+      });
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        setDrawer(false);
+      });
+    }
+
+    root.querySelectorAll('[data-archv-acc]').forEach(function (head) {
+      head.addEventListener('click', function () {
+        var body = document.getElementById(head.getAttribute('aria-controls'));
+        if (!body) return;
+        var open = body.hidden;
+        body.hidden = !open;
+        head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeAll(null);
+      if (drawer && !drawer.hidden) setDrawer(false);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "ARC Header v2",
+  "tag": "section",
+  "class": "arc-header-v2-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "Edit the names and links in Content → Menus. Three levels are supported: top item, column heading, links."
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo for light background",
+      "info": "Use the horizontal logo without the tagline."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_light",
+      "label": "Logo for dark background"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 28,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "checkbox",
+      "id": "logo_overhang",
+      "label": "Let the logo hang over the bar",
+      "default": true,
+      "info": "For a logo taller than the bar. It sits on the left and overlaps the edges instead of stretching the header."
+    },
+    {
+      "type": "header",
+      "content": "Bar"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "light", "label": "Light (blush)" },
+        { "value": "plum", "label": "Dark (plum)" },
+        { "value": "dark", "label": "Dark (navy)" }
+      ],
+      "default": "plum"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_see_all",
+      "label": "Show \"see all\" link at the bottom of dropdowns",
+      "default": false,
+      "info": "Column headings are always clickable, so this is usually not needed."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stay visible when scrolling",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language",
+      "label": "Show language switcher",
+      "default": true,
+      "info": "Appears when more than one language is published in Settings → Languages."
+    },
+    {
+      "type": "text",
+      "id": "drawer_footer",
+      "label": "Mobile menu footer",
+      "default": "Gràcia, Barcelona · Tuesday to Saturday, 11:00 to 20:00"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "panel_intro",
+      "name": "Dropdown: intro line",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Menu item",
+          "info": "Type the top-level menu item's name exactly as it appears in the menu."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Intro line"
+        }
+      ]
+    },
+    {
+      "type": "panel_feature",
+      "name": "Dropdown: featured card",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Menu item",
+          "info": "Type the top-level menu item's name exactly as it appears in the menu."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "text",
+          "id": "cta",
+          "label": "Link text",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+    ,
+    {
+      "type": "link_badge",
+      "name": "Dropdown: badge on a link",
+      "limit": 12,
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Link",
+          "info": "Type the link's name exactly as it appears in the menu, for example Preorders."
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "default": "New",
+          "info": "Leave empty to only highlight the link."
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            { "value": "none", "label": "Normal link" },
+            { "value": "accent", "label": "Highlighted link" }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "checkbox",
+          "id": "hot",
+          "label": "Stronger badge colour",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "presets": [
+    {
+      "name": "ARC Header v2",
+      "settings": {
+        "style": "plum",
+        "logo_height": 140,
+        "logo_overhang": true,
+        "sticky": true,
+        "show_search": true,
+        "show_account": true,
+        "show_language": true,
+        "show_see_all": false
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,969 @@
+/* ════════════════════════════════════════════════════════════
+   A ROMANCE COURT — Product Page Styles
+   Asset: arc-product-page.css
+   ════════════════════════════════════════════════════════════
+   Depends on arc-global-styles snippet for fonts:
+   Fonts and colours come from assets/arc-tokens.css
+
+   Brand palette (light):
+   #F1E1DD   page bg (cream)
+   #F1E1DD   blush
+   #DDC29F   sand gold
+   #B2AABB   lavender
+   #55294A   plum (text)
+   #4D3239   burgundy
+   #273046   navy
+   #371D2B   ink (deep text)
+   ════════════════════════════════════════════════════════════ */
+
+
+
+.arc-product {
+  --arc-cream:     #F1E1DD;
+  --arc-blush:     #F1E1DD;
+  --arc-sand:      #DDC29F;
+  --arc-sand-soft: rgba(221, 194, 159, 0.25);
+  --arc-lavender:  #B2AABB;
+  --arc-plum:      #55294A;
+  --arc-burgundy:  #4D3239;
+  --arc-navy:      #273046;
+  --arc-ink:       #371D2B;
+
+  --arc-text:        #371D2B;
+  --arc-text-soft:   rgba(55, 29, 43, 0.66);
+  --arc-text-muted:  rgba(55, 29, 43, 0.5);
+  --arc-line:        rgba(85, 41, 74, 0.14);
+  --arc-line-strong: rgba(85, 41, 74, 0.28);
+
+  position: relative;
+  background:
+    radial-gradient(ellipse at 18% 12%, var(--glow) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(221, 194, 159, 0.28) 0%, transparent 55%),
+    linear-gradient(180deg, #F1E1DD 0%, #F1E1DD 60%, #DDC29F 100%);
+  color: var(--arc-text);
+  padding: 4rem 0 6rem;
+  font-family: var(--font-body);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media (max-width: 749px) {
+  .arc-product { padding: 2rem 0 4rem; }
+}
+
+/* ── Atmospheric accents ── */
+.arc-product__atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.arc-product__glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  max-width: 900px;
+  max-height: 900px;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.55;
+}
+.arc-product__glow--top {
+  top: -25%;
+  right: -15%;
+  background: radial-gradient(circle, var(--glow), transparent 70%);
+}
+.arc-product__glow--bottom {
+  bottom: -30%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(221, 194, 159, 0.5), transparent 70%);
+  opacity: 0.4;
+}
+
+/* ── Container ── */
+.arc-product__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+@media (max-width: 749px) {
+  .arc-product__inner { padding: 0 1.25rem; }
+}
+
+/* ── Breadcrumb ── */
+.arc-product__breadcrumb {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--arc-text-muted);
+  margin-bottom: 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.arc-product__breadcrumb a {
+  color: var(--arc-text-muted);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.arc-product__breadcrumb a:hover { color: var(--accent-primary); }
+.arc-product__breadcrumb-current {
+  color: var(--arc-plum);
+  opacity: 0.85;
+}
+
+/* ════════════════════════════════════════════════
+   HEADER GRID
+   Balanced now — gallery doesn't need to be wider
+═══════════════════════════════════════════════ */
+.arc-product__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4rem;
+  align-items: start;
+}
+@media (max-width: 989px) {
+  .arc-product__header {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   FLOATING BOOK — Chunky hardcover treatment
+   ────────────────────────────────────────────────────────────
+   Structure (from main-product.liquid):
+     .arc-product__book          → outer stage, animated float
+       .arc-product__book-shadow → tight under-shadow plate
+       .arc-product__book-frame  → cover plate (holds <img>)
+         .arc-product__book-img  → cover artwork fills frame
+
+   Added via pseudo-elements:
+     .arc-product__book::before     → spine slab (left, always visible)
+     .arc-product__book::after      → right page-block (always visible)
+     .arc-product__book-frame::after → light/shadow gradient on cover
+     .arc-product__gallery::before  → wide soft glow underneath
+═══════════════════════════════════════════════════════════ */
+
+.arc-product__gallery {
+  position: sticky;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 1rem 1rem 2rem;
+}
+@media (max-width: 989px) {
+  .arc-product__gallery {
+    position: static;
+    top: auto;
+  }
+}
+
+/* Wide soft glow sitting behind the book */
+.arc-product__gallery::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  width: min(75%, 440px);
+  height: 80px;
+  background: radial-gradient(ellipse at center,
+    var(--glow) 0%,
+    var(--tint) 40%,
+    transparent 75%
+  );
+  filter: blur(34px);
+  z-index: 0;
+  pointer-events: none;
+  animation: arc-glow-pulse 5.5s ease-in-out infinite;
+}
+
+/* ── Book stage: capped width, fixed aspect ─────────────────
+   We render the spine as an always-visible chunky strip on the
+   LEFT of the cover, and the page-block as a chunky strip on
+   the RIGHT. Both are flat 2D strips sitting next to the cover
+   plate — no rotation needed to make them readable. The slight
+   book rotation in the float animation is purely a flourish on
+   top of an already-3D-reading object.
+─────────────────────────────────────────────────────────────── */
+.arc-product__book {
+  --arc-book-w: 400px;        /* total: cover + spine + page-edge */
+  --arc-spine-w: 32px;        /* spine slab — wide & prominent like Kafka */
+  --arc-page-w: 8px;          /* right-side page block */
+  --arc-cover-w: calc(var(--arc-book-w) - var(--arc-spine-w) - var(--arc-page-w));
+  --arc-book-h: calc(var(--arc-cover-w) * 1.52);  /* hardcover proportion */
+
+  position: relative;
+  width: var(--arc-book-w);
+  height: var(--arc-book-h);
+  margin: 0 auto;
+  z-index: 2;
+  cursor: zoom-in;
+  animation: arc-book-float 5.5s ease-in-out infinite;
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@media (max-width: 989px) { .arc-product__book { --arc-book-w: 360px; } }
+@media (max-width: 749px) { .arc-product__book { --arc-book-w: 320px; --arc-spine-w: 26px; } }
+@media (max-width: 480px) { .arc-product__book { --arc-book-w: 270px; --arc-spine-w: 22px; --arc-page-w: 6px; } }
+
+/* SPINE — chunky dark slab on the left, always visible */
+.arc-product__book::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--arc-spine-w);
+  background:
+    /* horizontal banding — suggests cloth-bound spine texture */
+    repeating-linear-gradient(
+      0deg,
+      rgba(241, 225, 221, 0.025) 0px,
+      transparent 1px,
+      transparent 3px,
+      rgba(21, 29, 44, 0.06) 4px
+    ),
+    /* main spine surface — neutral shading, no brand color */
+    linear-gradient(90deg,
+      rgba(21, 29, 44, 0.55) 0%,
+      rgba(21, 29, 44, 0.42) 12%,
+      rgba(21, 29, 44, 0.26) 45%,
+      rgba(21, 29, 44, 0.20) 75%,
+      rgba(21, 29, 44, 0.38) 92%,
+      rgba(21, 29, 44, 0.6) 100%
+    );
+  /* neutral dark base so the shading reads as a solid, colorless spine */
+  background-color: #371D2B;
+  border-radius: 3px 0 0 3px;
+  box-shadow:
+    /* gold rim on outer edge */
+    inset 2px 0 0 rgba(221, 194, 159, 0.32),
+    inset 1px 0 0 rgba(221, 194, 159, 0.18),
+    /* sharp dark crease at the binding (spine meets cover) */
+    inset -2px 0 0 rgba(21, 29, 44, 0.55),
+    inset -3px 0 4px rgba(21, 29, 44, 0.4),
+    /* outward depth shadow on the left */
+    -1px 0 3px rgba(21, 29, 44, 0.18);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* RIGHT PAGE-BLOCK — chunky striped cream on the right */
+.arc-product__book::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  right: 0;
+  width: var(--arc-page-w);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #F1E1DD 0px,
+      #DDC29F 1px,
+      #F1E1DD 2px,
+      #DDC29F 3px
+    );
+  box-shadow:
+    inset 1px 0 1px rgba(21, 29, 44, 0.18),
+    inset -1px 0 0 rgba(21, 29, 44, 0.25),
+    1px 0 3px rgba(21, 29, 44, 0.18);
+  border-radius: 0 2px 2px 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* The cover plate — sits between spine and page-edge */
+.arc-product__book-frame {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--arc-spine-w);
+  right: var(--arc-page-w);
+  border-radius: 0 4px 4px 0;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(221, 194, 159, 0.40),
+    inset 0 0 0 2px rgba(55, 29, 43, 0.25),
+    /* binding crease: dark shadow falling onto the cover from the spine */
+    inset 6px 0 12px -4px rgba(21, 29, 44, 0.45),
+    inset 2px 0 0 rgba(21, 29, 44, 0.55);
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+  z-index: 2;
+}
+
+/* Cover image — fills the frame */
+.arc-product__book-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Light overlay on the cover — gentle top sheen + bottom shadow.
+   The left-edge binding crease is handled by the spine slab + the
+   frame's own inset shadow. */
+.arc-product__book-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(241, 225, 221, 0.05) 0%,
+    transparent 10%,
+    transparent 90%,
+    rgba(21, 29, 44, 0.08) 100%
+  );
+}
+
+/* Tight under-shadow plate (existing .arc-product__book-shadow div) */
+.arc-product__book-shadow {
+  position: absolute;
+  left: 6%;
+  right: 4%;
+  bottom: -16px;
+  height: 28px;
+  background: radial-gradient(ellipse at center,
+    rgba(55, 29, 43, 0.38) 0%,
+    rgba(55, 29, 43, 0.20) 35%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  z-index: 1;
+  pointer-events: none;
+  animation: arc-shadow-pulse 5.5s ease-in-out infinite;
+}
+
+/* Placeholder (no image) — keeps the 3D treatment */
+.arc-product__book-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--arc-plum), var(--arc-burgundy));
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  text-align: center;
+  color: var(--arc-blush);
+  padding: 2rem;
+}
+
+/* Hover: pause + lift the whole book */
+.arc-product__book:hover {
+  animation-play-state: paused;
+  transform: translateY(-10px);
+}
+.arc-product__book:hover .arc-product__book-shadow {
+  animation-play-state: paused;
+  opacity: 0.7;
+  transform: scaleX(0.92);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PHOTO-COVER & NON-BOOK MODIFIERS
+   ────────────────────────────────────────────────────────────
+   --photo : product image is already a 3D book photo (spine +
+             pages + shading baked in). Set via "photo-cover" tag
+             or custom.photo_cover metafield.
+   --plain : product is NOT a book (merch, prints, candles, totes).
+             Set automatically by Liquid when is_book is false.
+
+   Both suppress the spine slab + page-block and let the product
+   image render at its natural aspect ratio. The float, under-shadow,
+   and glow stay on for both.
+═══════════════════════════════════════════════════════════ */
+.arc-product__book--photo,
+.arc-product__book--plain {
+  --arc-spine-w: 0px;
+  --arc-page-w: 0px;
+  --arc-book-w: 440px;
+  --arc-book-h: auto;
+  width: var(--arc-book-w);
+  height: auto;
+  aspect-ratio: auto;
+}
+@media (max-width: 989px) {
+  .arc-product__book--photo,
+  .arc-product__book--plain { --arc-book-w: 400px; }
+}
+@media (max-width: 749px) {
+  .arc-product__book--photo,
+  .arc-product__book--plain { --arc-book-w: 340px; }
+}
+@media (max-width: 480px) {
+  .arc-product__book--photo,
+  .arc-product__book--plain { --arc-book-w: 280px; }
+}
+
+/* Hide the spine slab + page-block */
+.arc-product__book--photo::before,
+.arc-product__book--photo::after,
+.arc-product__book--plain::before,
+.arc-product__book--plain::after {
+  display: none;
+}
+
+/* Cover plate spans the whole stage, no binding shadow; image sets height */
+.arc-product__book--photo .arc-product__book-frame,
+.arc-product__book--plain .arc-product__book-frame {
+  position: relative;
+  inset: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: auto;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(221, 194, 159, 0.18);
+}
+
+/* Image takes its natural aspect ratio */
+.arc-product__book--photo .arc-product__book-img,
+.arc-product__book--plain .arc-product__book-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* No cover light overlay — the image carries its own lighting */
+.arc-product__book--photo .arc-product__book-frame::after,
+.arc-product__book--plain .arc-product__book-frame::after {
+  display: none;
+}
+
+/* Under-shadow sits at the bottom of the image, not the stage */
+.arc-product__book--photo .arc-product__book-shadow,
+.arc-product__book--plain .arc-product__book-shadow {
+  bottom: -14px;
+  left: 12%;
+  right: 12%;
+}
+
+/* Animations */
+@keyframes arc-book-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes arc-shadow-pulse {
+  0%, 100% { opacity: 0.85; transform: scaleX(1); }
+  50%      { opacity: 1;    transform: scaleX(1.06); }
+}
+@keyframes arc-glow-pulse {
+  0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-product__book,
+  .arc-product__book-shadow,
+  .arc-product__gallery::before {
+    animation: none;
+  }
+}
+
+/* ── Thumbnails ── */
+.arc-product__thumbs {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
+}
+.arc-product__thumb {
+  width: 72px;
+  height: 108px;
+  padding: 3px;
+  background: rgba(241, 225, 221, 0.5);
+  border: 1px solid var(--arc-line);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.arc-product__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+.arc-product__thumb:hover { border-color: var(--accent-primary); }
+.arc-product__thumb.is-active {
+  border-color: var(--accent-primary);
+  box-shadow:
+    0 0 0 1px var(--tint),
+    0 6px 16px var(--glow);
+}
+
+/* ════════════════════════════════════════════════
+   PRODUCT INFO  (unchanged below this line)
+═══════════════════════════════════════════════ */
+.arc-product__info { padding-top: 0.5rem; }
+
+.arc-product__series-tag {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  background: var(--tint);
+  border: 1px solid var(--accent-primary);
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: all 0.25s ease;
+}
+.arc-product__series-tag:hover {
+  background: var(--accent-primary);
+  color: #F1E1DD;
+}
+
+.arc-product__title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  color: var(--arc-plum);
+  margin: 0 0 0.75rem;
+}
+
+.arc-product__author {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: var(--arc-text-soft);
+  margin: 0 0 1.5rem;
+  font-style: italic;
+}
+.arc-product__author-label {
+  opacity: 0.65;
+  margin-right: 0.35rem;
+  font-style: normal;
+}
+.arc-product__author-name {
+  color: var(--arc-plum);
+  text-decoration: none;
+  border-bottom: 1px solid var(--arc-line);
+  padding-bottom: 1px;
+  transition: all 0.25s ease;
+}
+.arc-product__author-name:hover {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.arc-product__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+.arc-product__stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+}
+.arc-star { color: rgba(85, 41, 74, 0.18); line-height: 1; }
+.arc-star--full { color: var(--accent-primary); }
+.arc-star--half {
+  background: linear-gradient(90deg, var(--accent-primary) 50%, rgba(85, 41, 74, 0.18) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.arc-star--empty { color: rgba(85, 41, 74, 0.18); }
+
+.arc-product__rating-link,
+.arc-product__rating-num {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  color: var(--arc-plum);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+.arc-product__rating-link {
+  border-bottom: 1px solid var(--arc-line);
+  padding-bottom: 1px;
+  transition: all 0.25s ease;
+}
+.arc-product__rating-link:hover {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.arc-product__price-block {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--arc-line);
+  border-bottom: 1px solid var(--arc-line);
+  margin-bottom: 2rem;
+}
+.arc-product__price {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--arc-plum);
+  letter-spacing: 0.01em;
+}
+.arc-product__price--sale { color: var(--accent-primary); }
+.arc-product__price-compare {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  color: var(--arc-text-muted);
+  text-decoration: line-through;
+}
+.arc-product__price-tag {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--tint);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+/* ════════════════════════════════════════════════
+   FORM
+═══════════════════════════════════════════════ */
+.arc-product__form { margin-bottom: 2.5rem; }
+
+.arc-product__variants {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.arc-product__variant-label,
+.arc-product__quantity-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--arc-text-muted);
+  margin-bottom: 0.55rem;
+}
+.arc-product__variant-select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  background: rgba(241, 225, 221, 0.6);
+  color: var(--arc-plum);
+  border: 1px solid var(--arc-line-strong);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2355294a' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+.arc-product__variant-select:hover { border-color: var(--accent-primary); }
+.arc-product__variant-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--tint);
+}
+
+.arc-product__quantity { margin-bottom: 1.75rem; }
+.arc-product__quantity-control {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--arc-line-strong);
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(241, 225, 221, 0.6);
+}
+.arc-product__qty-btn {
+  width: 44px;
+  height: 48px;
+  background: transparent;
+  border: 0;
+  color: var(--arc-plum);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+.arc-product__qty-btn:hover {
+  background: var(--tint);
+  color: var(--accent-primary);
+}
+.arc-product__qty-input {
+  width: 64px;
+  height: 48px;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--arc-line);
+  border-right: 1px solid var(--arc-line);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 2.5rem;
+  color: var(--arc-plum);
+}
+.arc-product__qty-input:focus { outline: none; }
+.arc-product__qty-input::-webkit-outer-spin-button,
+.arc-product__qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.arc-product__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.arc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1.05rem 2rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: 18.4px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.arc-btn--primary {
+  background: var(--arc-plum);
+  color: var(--arc-blush);
+  border-color: var(--arc-plum);
+}
+.arc-btn--primary:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px var(--glow);
+}
+.arc-btn--disabled,
+.arc-btn--primary:disabled {
+  background: rgba(85, 41, 74, 0.12);
+  color: var(--arc-text-muted);
+  border-color: var(--arc-line);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.arc-btn__loading { display: none; }
+.arc-btn.is-loading .arc-btn__label { opacity: 0; }
+.arc-btn.is-loading .arc-btn__loading {
+  display: inline-flex;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  animation: arc-spin 0.8s linear infinite;
+}
+.arc-btn.is-added {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+@keyframes arc-spin {
+  to { transform: rotate(360deg); }
+}
+
+.shopify-payment-button { width: 100%; }
+.shopify-payment-button__button {
+  font-family: var(--font-body) !important;
+  font-size: 1.3rem !important;
+  letter-spacing: 0.22em !important;
+  text-transform: uppercase !important;
+  padding: 1.05rem 2rem !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+  border: 1px solid var(--arc-line-strong) !important;
+  color: var(--arc-plum) !important;
+  transition: all 0.3s ease !important;
+}
+.shopify-payment-button__button:hover {
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  background: var(--tint) !important;
+}
+.shopify-payment-button__button--unbranded { background: transparent !important; }
+
+.arc-product__preorder-mount:not(:empty) {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--arc-line);
+}
+
+/* ════════════════════════════════════════════════
+   DESCRIPTION
+═══════════════════════════════════════════════ */
+.arc-product__description {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  line-height: 1.75;
+  color: var(--arc-text);
+  padding: 2rem 0;
+  border-top: 1px solid var(--arc-line);
+  margin-bottom: 2rem;
+}
+.arc-product__description p { margin: 0 0 1rem; }
+.arc-product__description p:last-child { margin-bottom: 0; }
+.arc-product__description em { color: var(--accent-primary); font-style: italic; }
+.arc-product__description strong { color: var(--arc-plum); font-weight: 600; }
+.arc-product__description a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--tint);
+  transition: all 0.25s ease;
+}
+.arc-product__description a:hover { border-bottom-color: var(--accent-primary); }
+
+/* ════════════════════════════════════════════════
+   META PANEL
+═══════════════════════════════════════════════ */
+.arc-product__meta {
+  border-top: 1px solid var(--arc-line);
+  margin: 0 0 2rem;
+  padding: 0.5rem 0 1.5rem;
+}
+.arc-product__meta-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--arc-line);
+  align-items: baseline;
+}
+.arc-product__meta-row:last-child { border-bottom: 0; }
+.arc-product__meta dt {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--arc-text-muted);
+  margin: 0;
+}
+.arc-product__meta dd {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  color: var(--arc-plum);
+  margin: 0;
+}
+.arc-product__meta dd a {
+  color: var(--arc-plum);
+  text-decoration: none;
+  border-bottom: 1px solid var(--arc-line);
+  transition: all 0.25s ease;
+}
+.arc-product__meta dd a:hover {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.arc-product__spice {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.arc-spice {
+  font-size: 1rem;
+  filter: grayscale(1) opacity(0.25);
+  transition: filter 0.25s ease;
+}
+.arc-spice--on { filter: grayscale(0) opacity(1); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .arc-product__meta-row {
+    grid-template-columns: 100px 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   CHIPS (collections + tags)
+═══════════════════════════════════════════════ */
+.arc-product__chips { margin-bottom: 1.5rem; }
+.arc-product__chips-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--arc-text-muted);
+  margin-bottom: 0.65rem;
+}
+.arc-product__chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.arc-chip {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border: 1px solid var(--arc-line-strong);
+}
+.arc-chip--collection {
+  background: rgba(241, 225, 221, 0.6);
+  color: var(--arc-plum);
+}
+.arc-chip--collection:hover {
+  background: var(--arc-plum);
+  border-color: var(--arc-plum);
+  color: var(--arc-blush);
+}
+.arc-chip--tag {
+  background: transparent;
+  color: var(--arc-text-soft);
+}
+.arc-chip--tag:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--tint);
+}

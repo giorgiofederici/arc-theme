@@ -1,0 +1,245 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     section: arc-benefits.liquid
+     A Romance Court — House Membership Benefits Page
+     
+     SETUP:
+     1. Add this file to: sections/arc-benefits.liquid
+     2. Add the CSS below to: assets/arc-benefits.css
+     3. Create a new page template (templates/page.benefits.json):
+        {
+          "sections": {
+            "main": {
+              "type": "arc-benefits",
+              "settings": {}
+            }
+          },
+          "order": ["main"]
+        }
+     4. Create a page in Shopify admin using the "benefits" template
+     ═══════════════════════════════════════════════════════════════ -->
+
+{{ 'arc-benefits.css' | asset_url | stylesheet_tag }}
+
+<style>
+  /* Force brand fonts on ALL benefits page text */
+  #shopify-section-{{ section.id }} .arc-benefits p,
+  #shopify-section-{{ section.id }} .arc-benefits li,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-hero-verse,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-emphasis,
+  #shopify-section-{{ section.id }} .arc-benefits .card-legacy,
+  #shopify-section-{{ section.id }} .arc-benefits .sol-emphasis,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-cta-subtext,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-ben-header p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-initiation-block p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-pack-item p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-priv-card p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-traveling-intro p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-traveling-card p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-solstice-block p,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-standings-note,
+  #shopify-section-{{ section.id }} .arc-benefits .arc-court-tag {
+    font-family: var(--font-body) !important;
+  }
+  #shopify-section-{{ section.id }} .arc-benefits .arc-eyebrow {
+    font-family: var(--font-body) !important;
+  }
+  #shopify-section-{{ section.id }} .arc-benefits h1 {
+    font-family: var(--font-heading) !important;
+  }
+  #shopify-section-{{ section.id }} .arc-benefits h2 {
+    font-family: var(--font-heading) !important;
+  }
+  #shopify-section-{{ section.id }} .arc-benefits h3,
+  #shopify-section-{{ section.id }} .arc-benefits h4 {
+    font-family: var(--font-body) !important;
+  }
+</style>
+
+<div class="arc-benefits">
+
+  <!-- ═══ HERO ═══ -->
+  <section id="arc-benefits-hero">
+    <span class="arc-eyebrow arc-reveal">A Romance Court</span>
+    <h1 class="arc-reveal">House Membership<br>Benefits</h1>
+    <p class="arc-hero-verse arc-reveal">Belonging is earned. Legacy is built.<br>When you join a House, you don't just attend events — you become part of a living structure inside the Court.</p>
+  </section>
+
+  <!-- ═══ INITIATION ═══ -->
+  <section class="arc-ben-section">
+    <div class="arc-ben-header">
+      <span class="arc-eyebrow arc-reveal">The Beginning</span>
+      <h2 class="arc-reveal">House Initiation</h2>
+    </div>
+    <div class="arc-initiation-block arc-reveal">
+      <span class="arc-init-icon">🕯</span>
+      <p>A ceremonial assignment during Open Court — in person at our Gràcia bookstore or via Instagram Live. Sir Knotsalot presides over each initiation.</p>
+      <p>Alignment is not chosen. It is revealed.</p>
+      <span class="arc-emphasis">This is where your legacy begins.</span>
+    </div>
+  </section>
+
+  <div class="arc-ornament"><span></span><span class="dot">✦</span><span></span></div>
+
+  <!-- ═══ HOUSE PACK ═══ -->
+  <section class="arc-ben-section">
+    <div class="arc-ben-header">
+      <span class="arc-eyebrow arc-reveal">Your House Pack</span>
+      <h2 class="arc-reveal">Marks of Belonging</h2>
+      <p class="arc-reveal">Upon initiation, you receive your visible marks within the Court.</p>
+    </div>
+    <div class="arc-pack-grid">
+      <div class="arc-pack-item arc-reveal">
+        <span class="pack-icon">🎒</span>
+        <h4>House Tote Bag</h4>
+        <p>Official bag in your House colours. Carried to events, seen across the Court.</p>
+      </div>
+      <div class="arc-pack-item arc-reveal">
+        <span class="pack-icon">✦</span>
+        <h4>House Sticker</h4>
+        <p>Worn, placed, displayed. Your allegiance made visible.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="arc-ornament"><span></span><span class="dot">✦</span><span></span></div>
+
+  <!-- ═══ PRIVILEGES ═══ -->
+  <section class="arc-ben-section">
+    <div class="arc-ben-header">
+      <span class="arc-eyebrow arc-reveal">Membership Privileges</span>
+      <h2 class="arc-reveal">What Your House<br>Grants You</h2>
+    </div>
+    <div class="arc-priv-grid">
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">🔐</span>
+        <h4>Priority Event Access</h4>
+        <p>Early booking for select events, workshops, and limited-capacity gatherings before they open to the public.</p>
+      </div>
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">💬</span>
+        <h4>House Channel</h4>
+        <p>A private space for your House — announcements, coordination, internal discussions, and strategy.</p>
+      </div>
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">📚</span>
+        <h4>Court Library</h4>
+        <p>Access to curated titles within the shared Court Library — stories that circulate inside the community.</p>
+      </div>
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">🏆</span>
+        <h4>Earn House Points</h4>
+        <p>Earn points through purchases, readings, challenges, and events. Rivalry builds legacy.</p>
+      </div>
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">🌙</span>
+        <h4>House-Only Gatherings</h4>
+        <p>Exclusive meetups, challenges, and internal House activities throughout the year.</p>
+      </div>
+      <div class="arc-priv-card arc-reveal">
+        <span class="priv-icon">📖</span>
+        <h4>Traveling Book</h4>
+        <p>A single book passed hand to hand between members, building a shared legacy with every reader.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="arc-ornament"><span></span><span class="dot">✦</span><span></span></div>
+
+  <!-- ═══ TRAVELING BOOKS ═══ -->
+  <section class="arc-ben-section">
+    <div class="arc-ben-header">
+      <span class="arc-eyebrow arc-reveal">One Story. Many Hands.</span>
+      <h2 class="arc-reveal">The Traveling Book</h2>
+    </div>
+    <div class="arc-traveling-intro arc-reveal">
+      <p>A single book, passed from member to member. Each reader leaves their mark. When the journey ends, the book retires into the library — and becomes part of a permanent legacy.</p>
+    </div>
+
+    <div class="arc-traveling-grid">
+      <div class="arc-traveling-card arc-reveal">
+        <span class="card-icon">🏰</span>
+        <h3>House Traveling Book</h3>
+        <p>Each House carries one Traveling Book at a time, chosen by majority vote of the House Council.</p>
+        <ul>
+          <li>Must come from A Romance Court's store collection</li>
+          <li>May be in English or Spanish</li>
+          <li>Reading order determined by the House Council</li>
+          <li>Members pass the book from one to the next</li>
+          <li>Once all members have read it, the book retires</li>
+        </ul>
+        <p class="card-legacy">It becomes part of the House's permanent legacy.</p>
+      </div>
+
+      <div class="arc-traveling-card arc-reveal">
+        <span class="card-icon">👑</span>
+        <h3>Court Traveling Book</h3>
+        <p>In addition to House books, each Court carries one Traveling Book. Courts are genre-based communities that cross House lines:</p>
+        <div class="arc-court-list">
+          <span class="arc-court-tag">Romantasy</span>
+          <span class="arc-court-tag">Fantasy</span>
+          <span class="arc-court-tag">Contemporary</span>
+          <span class="arc-court-tag">Young Adult</span>
+          <span class="arc-court-tag">Cliterature</span>
+          <span class="arc-court-tag">Dark</span>
+          <span class="arc-court-tag">LGBTWI+</span>
+          <span class="arc-court-tag">Sport</span>
+        </div>
+        <p>Each Court Traveling Book follows the same circulation structure and becomes part of that Court's evolving library once completed.</p>
+        <p class="card-legacy">One story moves through many hands. What remains is legacy.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="arc-ornament"><span></span><span class="dot">✦</span><span></span></div>
+
+  <!-- ═══ SOLSTICE ═══ -->
+  <section class="arc-ben-section">
+    <div class="arc-ben-header">
+      <span class="arc-eyebrow arc-reveal">The Veil Thins</span>
+      <h2 class="arc-reveal">Solstice Realignment</h2>
+    </div>
+    <div class="arc-solstice-block arc-reveal">
+      <span class="sol-icon">🔄</span>
+      <h3>Changing Houses</h3>
+      <p>Allegiance is not permanent. Twice a year — during the Solstice Parties — the veil is thinner. Members may request realignment during these ceremonies.</p>
+      <span class="sol-emphasis">Sir Knotsalot decides.</span>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═══ -->
+  <section id="arc-benefits-cta">
+    <div class="arc-ornament" style="margin-bottom: 48px;"><span></span><span class="dot">✦</span><span></span></div>
+    <h2 class="arc-reveal">Join a House.<br>Build something lasting.</h2>
+    <a href="https://aromancecourt.com/products/a-romance-court-membership-official-initiation-into-the-houses#MainContent" class="arc-btn-primary arc-reveal" data-text="Book Your Initiation">Book Your Initiation</a>
+    <p class="arc-cta-subtext arc-reveal">Initiations take place during Open Court — in person or live.</p>
+  </section>
+
+</div>
+
+<script>
+/* ═══ Scroll reveal (same pattern as houses page) ═══ */
+(function() {
+  var reveals = document.querySelectorAll('.arc-reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('arc-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(function(el) { observer.observe(el); });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "House Benefits",
+  "settings": [],
+  "presets": [
+    {
+      "name": "House Benefits"
+    }
+  ]
+}
+{% endschema %}

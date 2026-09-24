@@ -1,0 +1,674 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════
+  A ROMANCE COURT — Product Page (Books)
+  Section: main-product (book template)
+  ════════════════════════════════════════════════════════════
+  Place this in: sections/main-product.liquid
+  Or create a new product template: templates/product.book.json
+  using this section.
+
+  REQUIRES:
+  - Snippet: arc-global-styles (for fonts & tokens)
+  - Asset:   arc-product-page.css
+  - App:     Timesact (Pre-order Now WOD) for preorder button rendering
+
+  METAFIELDS USED (Books category):
+  • product.metafields.shopify.book-cover-type
+  • product.metafields.shopify.language       (or language version)
+  • product.metafields.shopify.target-audience
+  • product.metafields.custom.author          (text)
+  • product.metafields.custom.rating          (number)
+  • product.metafields.custom.rating_link     (url)  — link to Goodreads/Storygraph
+  • product.metafields.custom.part_of_a_series (boolean)
+  • product.metafields.custom.series_name     (text)
+  • product.metafields.custom.release_date    (date)
+  • product.metafields.custom.spice_rating    (number 0–5)
+  • product.metafields.custom.photo_cover     (boolean) — see below
+
+  ── PHOTO-COVER FLAG ─────────────────────────────────────────
+  When the product image is a styled product photo that ALREADY
+  shows the book's spine and pages (rather than a flat front-
+  cover scan), set EITHER of:
+    • Tag: "photo-cover"
+    • Metafield: custom.photo_cover = true
+
+  The CSS will skip its synthetic spine + page-block for these
+  products so we don't double up.
+  ════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{{ 'arc-product-page.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+
+  assign product_form_id = 'arc-product-form-' | append: section.id
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured_image  = product.featured_image
+  assign other_images    = product.images
+
+  # Metafields — wrap in safe lookups
+  # Standard Shopify taxonomy fields (no .value — render as list of taxonomy nodes)
+  assign mf_cover_type    = product.metafields.shopify.book-cover-type
+  assign mf_language      = product.metafields.shopify.language
+  assign mf_lang_version  = product.metafields.shopify.language-version
+  assign mf_audience      = product.metafields.shopify.target-audience
+  assign mf_author        = product.metafields.custom.author
+  assign mf_rating        = product.metafields.custom.rating
+  assign mf_rating_link   = product.metafields.custom.rating_link
+  assign mf_in_series     = product.metafields.custom.part_of_a_series
+  assign mf_series_name   = product.metafields.custom.series_name
+  assign mf_release_date  = product.metafields.custom.release_date
+  assign mf_spice         = product.metafields.custom.spice_rating
+  assign mf_photo_cover   = product.metafields.custom.photo_cover
+
+  # ── Detect whether this product is a BOOK ──
+  # Only books get the spine/page treatment. Merch, prints, candles,
+  # totes, etc. render as a plain floating image. A product counts as
+  # a book if ANY of these hold:
+  #   • product.type looks book-ish
+  #   • it has the Shopify book-cover-type metafield
+  #   • it has a custom.author
+  #   • it carries a "book" tag
+  assign is_book = false
+  assign ptype = product.type | downcase
+  if ptype contains 'book' or ptype == 'novel' or ptype contains 'paperback' or ptype contains 'hardcover' or ptype contains 'hardback'
+    assign is_book = true
+  endif
+  if mf_cover_type != blank
+    assign is_book = true
+  endif
+  if mf_author != blank
+    assign is_book = true
+  endif
+  for tag in product.tags
+    assign tl_book = tag | downcase
+    if tl_book == 'book' or tl_book == 'books'
+      assign is_book = true
+    endif
+  endfor
+
+  # Detect preorder via Timesact tag or release date in future
+  assign is_preorder = false
+  for tag in product.tags
+    assign tl = tag | downcase
+    if tl == 'preorder' or tl contains 'preorder' or tl contains 'pre-order'
+      assign is_preorder = true
+    endif
+  endfor
+
+  # ── Detect photo-style cover image ──
+  # If the featured image is already a product photo that includes
+  # the spine + page-block (i.e. a 3D book mockup), skip the CSS
+  # spine treatment so we don't double up.
+  assign is_photo_cover = false
+  if mf_photo_cover
+    assign is_photo_cover = true
+  endif
+  for tag in product.tags
+    assign tl_photo = tag | downcase
+    if tl_photo == 'photo-cover' or tl_photo == 'photo cover' or tl_photo == 'photocover'
+      assign is_photo_cover = true
+    endif
+  endfor
+
+  # Use language version if main language is empty
+  assign display_language = mf_language
+  if display_language == blank
+    assign display_language = mf_lang_version
+  endif
+
+  # ── Pre-compute whether the meta panel will have ANY rows ──
+  assign has_meta = false
+  if mf_cover_type != blank
+    assign has_meta = true
+  endif
+  if display_language != blank
+    assign has_meta = true
+  endif
+  if mf_audience != blank
+    assign has_meta = true
+  endif
+  if mf_author != blank
+    assign has_meta = true
+  endif
+  if mf_in_series
+    assign has_meta = true
+  endif
+  if mf_release_date != blank
+    assign has_meta = true
+  endif
+  if mf_spice != blank and mf_spice != 0
+    assign has_meta = true
+  endif
+
+  # ── Pre-filter visible collections (exclude system / hidden) ──
+  assign visible_collections_count = 0
+  for col in product.collections
+    unless col.handle contains 'all' or col.handle == 'frontpage'
+      assign visible_collections_count = visible_collections_count | plus: 1
+    endunless
+  endfor
+
+  # ── Pre-filter visible tags (exclude internal markers) ──
+  assign visible_tags_count = 0
+  for tag in product.tags
+    assign tl_check = tag | downcase
+    unless tl_check contains 'preorder' or tl_check contains 'bookbox' or tl_check == 'photo-cover' or tl_check == 'photo cover' or tl_check == 'photocover'
+      assign visible_tags_count = visible_tags_count | plus: 1
+    endunless
+  endfor
+-%}
+
+<section class="arc-product" data-product-id="{{ product.id }}">
+
+  {% comment %} ─────────── DECORATIVE BACKGROUND ─────────── {% endcomment %}
+  <div class="arc-product__atmosphere" aria-hidden="true">
+    <div class="arc-product__glow arc-product__glow--top"></div>
+    <div class="arc-product__glow arc-product__glow--bottom"></div>
+  </div>
+
+  <div class="arc-product__inner">
+
+    {% comment %} ─────────── BREADCRUMB ─────────── {% endcomment %}
+    <nav class="arc-product__breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span aria-hidden="true">·</span>
+      {%- if collection -%}
+        <a href="{{ collection.url }}">{{ collection.title }}</a>
+        <span aria-hidden="true">·</span>
+      {%- endif -%}
+      <span class="arc-product__breadcrumb-current">{{ product.title }}</span>
+    </nav>
+
+    {% comment %} ═══════════════ HEADER GRID: GALLERY + INFO ═══════════════ {% endcomment %}
+    <div class="arc-product__header">
+
+      {% comment %} ─────────── FLOATING BOOK GALLERY ─────────── {% endcomment %}
+      <div class="arc-product__gallery">
+
+        <div
+          class="arc-product__book{% if is_photo_cover %} arc-product__book--photo{% endif %}{% unless is_book %} arc-product__book--plain{% endunless %}"
+          data-floating-book
+        >
+          <div class="arc-product__book-shadow" aria-hidden="true"></div>
+          <div class="arc-product__book-frame">
+            {%- if featured_image != blank -%}
+              <img
+                id="arc-main-image"
+                class="arc-product__book-img"
+                src="{{ featured_image | image_url: width: 800 }}"
+                srcset="{{ featured_image | image_url: width: 400 }} 400w,
+                        {{ featured_image | image_url: width: 600 }} 600w,
+                        {{ featured_image | image_url: width: 800 }} 800w,
+                        {{ featured_image | image_url: width: 1200 }} 1200w"
+                sizes="(min-width: 990px) 520px, (min-width: 750px) 440px, 90vw"
+                alt="{{ featured_image.alt | default: product.title | escape }}"
+                width="{{ featured_image.width }}"
+                height="{{ featured_image.height }}"
+                loading="eager"
+                fetchpriority="high"
+              >
+            {%- else -%}
+              <div class="arc-product__book-placeholder">
+                {{ product.title | escape }}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- if other_images.size > 1 -%}
+          <div class="arc-product__thumbs" role="list">
+            {%- for image in other_images -%}
+              <button
+                class="arc-product__thumb {% if forloop.first %}is-active{% endif %}"
+                data-thumb
+                data-full="{{ image | image_url: width: 1200 }}"
+                data-srcset="{{ image | image_url: width: 400 }} 400w, {{ image | image_url: width: 800 }} 800w, {{ image | image_url: width: 1200 }} 1200w"
+                aria-label="View image {{ forloop.index }}"
+                role="listitem"
+                type="button"
+              >
+                <img
+                  src="{{ image | image_url: width: 200 }}"
+                  alt="{{ image.alt | default: product.title | escape }}"
+                  width="100"
+                  height="150"
+                  loading="lazy"
+                >
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+
+      {% comment %} ─────────── PRODUCT INFO ─────────── {% endcomment %}
+      <div class="arc-product__info">
+
+        {%- if mf_in_series and mf_series_name != blank -%}
+          <a href="{{ routes.search_url }}?q={{ mf_series_name | url_encode }}" class="arc-product__series-tag">
+            {{ mf_series_name }}
+          </a>
+        {%- endif -%}
+
+        <h1 class="arc-product__title" itemprop="name">{{ product.title }}</h1>
+
+        {%- if mf_author != blank -%}
+          <p class="arc-product__author">
+            <span class="arc-product__author-label">by</span>
+            <a href="{{ routes.search_url }}?q={{ mf_author | url_encode }}" class="arc-product__author-name">
+              {{ mf_author }}
+            </a>
+          </p>
+        {%- endif -%}
+
+        {% comment %} ─────────── RATING ─────────── {% endcomment %}
+        {%- if mf_rating != blank -%}
+          {%- assign rating_num = mf_rating | times: 1.0 -%}
+          <div class="arc-product__rating">
+            <div class="arc-product__stars" aria-hidden="true">
+              {%- assign full_stars = rating_num | floor -%}
+              {%- assign decimal = rating_num | minus: full_stars -%}
+              {%- assign half_index = full_stars | plus: 1 -%}
+              {%- for i in (1..5) -%}
+                {%- if i <= full_stars -%}
+                  <span class="arc-star arc-star--full">★</span>
+                {%- elsif i == half_index and decimal >= 0.25 -%}
+                  <span class="arc-star arc-star--half">★</span>
+                {%- else -%}
+                  <span class="arc-star arc-star--empty">☆</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            {%- if mf_rating_link != blank -%}
+              <a href="{{ mf_rating_link }}" target="_blank" rel="noopener" class="arc-product__rating-link">
+                {{ rating_num }}<span aria-hidden="true"> ↗</span>
+              </a>
+            {%- else -%}
+              <span class="arc-product__rating-num">{{ rating_num }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {% comment %} ─────────── PRICE ─────────── {% endcomment %}
+        <div class="arc-product__price-block" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+          <meta itemprop="availability" content="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span class="arc-product__price arc-product__price--sale" itemprop="price" content="{{ current_variant.price | divided_by: 100.0 }}">
+              {{ current_variant.price | money }}
+            </span>
+            <span class="arc-product__price-compare">{{ current_variant.compare_at_price | money }}</span>
+          {%- else -%}
+            <span class="arc-product__price" itemprop="price" content="{{ current_variant.price | divided_by: 100.0 }}">
+              {{ current_variant.price | money }}
+            </span>
+          {%- endif -%}
+
+          {%- if is_preorder -%}
+            <span class="arc-product__price-tag arc-product__price-tag--preorder">Preorder</span>
+          {%- endif -%}
+        </div>
+
+        {% comment %} ─────────── ADD TO CART / PREORDER FORM ─────────── {% endcomment %}
+        {%- form 'product', product, id: product_form_id, class: 'arc-product__form', novalidate: 'novalidate' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+          {%- if product.has_only_default_variant == false -%}
+            <div class="arc-product__variants">
+              {%- for option in product.options_with_values -%}
+                <div class="arc-product__variant-group">
+                  <label class="arc-product__variant-label" for="arc-option-{{ forloop.index }}">
+                    {{ option.name }}
+                  </label>
+                  <select
+                    id="arc-option-{{ forloop.index }}"
+                    class="arc-product__variant-select"
+                    name="options[{{ option.name | escape }}]"
+                    data-option-index="{{ forloop.index0 }}"
+                  >
+                    {%- for value in option.values -%}
+                      <option
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}selected{% endif %}
+                      >
+                        {{ value }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="arc-product__quantity">
+            <label class="arc-product__quantity-label" for="arc-quantity">Quantity</label>
+            <div class="arc-product__quantity-control">
+              <button type="button" class="arc-product__qty-btn" data-qty-minus aria-label="Decrease quantity">−</button>
+              <input
+                id="arc-quantity"
+                class="arc-product__qty-input"
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                aria-label="Quantity"
+              >
+              <button type="button" class="arc-product__qty-btn" data-qty-plus aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          {% comment %}
+            ─── BUTTONS ───
+            Timesact will automatically replace the standard Add to Cart button
+            with its preorder UI when a preorder is configured for the product.
+          {% endcomment %}
+          <div class="arc-product__buttons">
+            {%- if product.available -%}
+              <button
+                type="submit"
+                name="add"
+                class="arc-btn arc-btn--primary arc-product__atc"
+                data-arc-atc
+                {% if is_preorder %}data-preorder="true"{% endif %}
+              >
+                <span class="arc-btn__label">
+                  {%- if is_preorder -%}
+                    Preorder · {{ current_variant.price | money }}
+                  {%- else -%}
+                    Add to Cart
+                  {%- endif -%}
+                </span>
+                <span class="arc-btn__loading" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" stroke-dasharray="40" stroke-dashoffset="20" stroke-linecap="round" />
+                  </svg>
+                </span>
+              </button>
+
+              {{ form | payment_button }}
+
+            {%- else -%}
+              <button type="button" class="arc-btn arc-btn--primary arc-btn--disabled" disabled>
+                Sold Out
+              </button>
+            {%- endif -%}
+          </div>
+
+          <div class="arc-product__preorder-mount" data-timesact-preorder></div>
+
+        {%- endform -%}
+
+        {% comment %} ─────────── DESCRIPTION ─────────── {% endcomment %}
+        {%- if product.description != blank -%}
+          <div class="arc-product__description rte" itemprop="description">
+            {{ product.description }}
+          </div>
+        {%- endif -%}
+
+        {% comment %} ─────────── METAFIELDS PANEL ─────────── {% endcomment %}
+        {%- if has_meta -%}
+          <dl class="arc-product__meta">
+
+            {%- if mf_cover_type != blank -%}
+              <div class="arc-product__meta-row">
+                <dt>Cover</dt>
+                <dd>
+                  {%- for item in mf_cover_type.value -%}
+                    {{ item.label }}{% unless forloop.last %}, {% endunless %}
+                  {%- endfor -%}
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if display_language != blank -%}
+              <div class="arc-product__meta-row">
+                <dt>Language</dt>
+                <dd>
+                  {%- for item in display_language.value -%}
+                    {{ item.label }}{% unless forloop.last %}, {% endunless %}
+                  {%- endfor -%}
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if mf_audience != blank -%}
+              <div class="arc-product__meta-row">
+                <dt>For</dt>
+                <dd>
+                  {%- for item in mf_audience.value -%}
+                    {{ item.label }}{% unless forloop.last %}, {% endunless %}
+                  {%- endfor -%}
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if mf_author != blank -%}
+              <div class="arc-product__meta-row">
+                <dt>Author</dt>
+                <dd>
+                  <a href="{{ routes.search_url }}?q={{ mf_author | url_encode }}">{{ mf_author }}</a>
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if mf_in_series -%}
+              <div class="arc-product__meta-row">
+                <dt>Series</dt>
+                <dd>
+                  {%- if mf_series_name != blank -%}
+                    <a href="{{ routes.search_url }}?q={{ mf_series_name | url_encode }}">{{ mf_series_name }}</a>
+                  {%- else -%}
+                    Yes
+                  {%- endif -%}
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if mf_release_date != blank -%}
+              <div class="arc-product__meta-row">
+                <dt>Released</dt>
+                <dd>
+                  <time datetime="{{ mf_release_date | date: '%Y-%m-%d' }}">
+                    {{ mf_release_date | date: '%b %-d, %Y' }}
+                  </time>
+                </dd>
+              </div>
+            {%- endif -%}
+
+            {%- if mf_spice != blank and mf_spice != 0 -%}
+              {%- assign spice_int = mf_spice | floor -%}
+              <div class="arc-product__meta-row">
+                <dt>Spice</dt>
+                <dd class="arc-product__spice">
+                  {%- for i in (1..5) -%}
+                    {%- if i <= spice_int -%}
+                      <span class="arc-spice arc-spice--on" aria-hidden="true">🌶</span>
+                    {%- else -%}
+                      <span class="arc-spice arc-spice--off" aria-hidden="true">🌶</span>
+                    {%- endif -%}
+                  {%- endfor -%}
+                  <span class="visually-hidden">{{ mf_spice }} out of 5</span>
+                </dd>
+              </div>
+            {%- endif -%}
+
+          </dl>
+        {%- endif -%}
+
+        {% comment %} ─────────── COLLECTIONS ─────────── {% endcomment %}
+        {%- if visible_collections_count > 0 -%}
+          <div class="arc-product__chips">
+            <span class="arc-product__chips-label">Found in</span>
+            <div class="arc-product__chips-list">
+              {%- for col in product.collections -%}
+                {%- unless col.handle contains 'all' or col.handle == 'frontpage' -%}
+                  <a href="{{ col.url }}" class="arc-chip arc-chip--collection">{{ col.title }}</a>
+                {%- endunless -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        {% comment %} ─────────── TAGS ─────────── {% endcomment %}
+        {%- if visible_tags_count > 0 -%}
+          <div class="arc-product__chips">
+            <span class="arc-product__chips-label">Tags</span>
+            <div class="arc-product__chips-list">
+              {%- for tag in product.tags -%}
+                {%- assign tl_render = tag | downcase -%}
+                {%- unless tl_render contains 'preorder' or tl_render contains 'bookbox' or tl_render == 'photo-cover' or tl_render == 'photo cover' or tl_render == 'photocover' -%}
+                  <a href="{{ routes.search_url }}?q={{ tag | url_encode }}" class="arc-chip arc-chip--tag">{{ tag }}</a>
+                {%- endunless -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% comment %} ─────────── JS — gallery, qty, atc UX ─────────── {% endcomment %}
+<script>
+  (function () {
+    const root = document.querySelector('.arc-product[data-product-id="{{ product.id }}"]');
+    if (!root) return;
+
+    // ── Thumbnail gallery ──
+    const mainImg = root.querySelector('#arc-main-image');
+    const thumbs  = root.querySelectorAll('[data-thumb]');
+    thumbs.forEach(t => {
+      t.addEventListener('click', () => {
+        thumbs.forEach(o => o.classList.remove('is-active'));
+        t.classList.add('is-active');
+        if (mainImg) {
+          mainImg.src = t.dataset.full;
+          if (t.dataset.srcset) mainImg.srcset = t.dataset.srcset;
+        }
+      });
+    });
+
+    // ── Quantity controls ──
+    const qty   = root.querySelector('#arc-quantity');
+    const minus = root.querySelector('[data-qty-minus]');
+    const plus  = root.querySelector('[data-qty-plus]');
+    if (minus && qty) minus.addEventListener('click', () => {
+      const v = parseInt(qty.value, 10) || 1;
+      if (v > 1) qty.value = v - 1;
+    });
+    if (plus && qty) plus.addEventListener('click', () => {
+      qty.value = (parseInt(qty.value, 10) || 1) + 1;
+    });
+
+    // ── Variant change → update form variant id + price ──
+    const selects = root.querySelectorAll('[data-option-index]');
+    const variants = {{ product.variants | json }};
+    const variantInput = root.querySelector('input[name="id"]');
+    const priceEl = root.querySelector('.arc-product__price');
+    const priceCompareEl = root.querySelector('.arc-product__price-compare');
+    const atcLabel = root.querySelector('[data-arc-atc] .arc-btn__label');
+
+    function formatMoney(cents) {
+      return '{{ cart.currency.symbol }}' + (cents / 100).toFixed(2);
+    }
+
+    selects.forEach(s => {
+      s.addEventListener('change', () => {
+        const chosen = Array.from(selects).map(sel => sel.value);
+        const match  = variants.find(v =>
+          v.options.every((opt, i) => opt === chosen[i])
+        );
+        if (match && variantInput) {
+          variantInput.value = match.id;
+          if (priceEl) priceEl.textContent = formatMoney(match.price);
+          if (priceCompareEl) {
+            if (match.compare_at_price && match.compare_at_price > match.price) {
+              priceCompareEl.textContent = formatMoney(match.compare_at_price);
+              priceCompareEl.style.display = '';
+            } else {
+              priceCompareEl.style.display = 'none';
+            }
+          }
+          if (atcLabel) {
+            const isPreorder = root.querySelector('[data-arc-atc]').dataset.preorder === 'true';
+            atcLabel.textContent = isPreorder
+              ? 'Preorder · ' + formatMoney(match.price)
+              : 'Add to Cart';
+          }
+
+          const url = new URL(window.location);
+          url.searchParams.set('variant', match.id);
+          window.history.replaceState({}, '', url);
+        }
+      });
+    });
+
+    // ── ATC AJAX (graceful — falls back to native form post if it fails) ──
+    const form = root.querySelector('form.arc-product__form');
+    const atcBtn = root.querySelector('[data-arc-atc]');
+    if (form && atcBtn && !atcBtn.dataset.preorder) {
+      form.addEventListener('submit', async (e) => {
+        if (atcBtn.dataset.preorder === 'true') return;
+
+        e.preventDefault();
+        atcBtn.classList.add('is-loading');
+        atcBtn.disabled = true;
+
+        try {
+          const formData = new FormData(form);
+          const res = await fetch('/cart/add.js', {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          });
+          if (!res.ok) throw new Error('Add to cart failed');
+          await res.json();
+
+          const cartRes = await fetch('/cart.js');
+          const cart = await cartRes.json();
+          document.querySelectorAll('[data-cart-count], .cart-count, .header__cart-count').forEach(el => {
+            el.textContent = cart.item_count;
+            el.classList.toggle('is-empty', cart.item_count === 0);
+          });
+
+          document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+
+          atcBtn.classList.remove('is-loading');
+          atcBtn.classList.add('is-added');
+          const labelEl = atcBtn.querySelector('.arc-btn__label');
+          const original = labelEl.textContent;
+          labelEl.textContent = 'Added ✓';
+          setTimeout(() => {
+            labelEl.textContent = original;
+            atcBtn.classList.remove('is-added');
+            atcBtn.disabled = false;
+          }, 1800);
+
+          const drawer = document.querySelector('cart-drawer, #CartDrawer, [data-cart-drawer]');
+          if (drawer && drawer.open) drawer.open();
+
+        } catch (err) {
+          console.warn('ARC ATC fallback to form post:', err);
+          atcBtn.classList.remove('is-loading');
+          atcBtn.disabled = false;
+          form.submit();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "ARC Product (Books)",
+  "tag": "section",
+  "class": "arc-product-section",
+  "settings": [],
+  "presets": [
+    { "name": "ARC Product (Books)" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,89 @@
+{%- comment -%}
+  A ROMANCE COURT — Monthly Book Box
+  Section: arc-book-box
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; background:var(--bg-primary) !important; }
+  .arc-bookbox-wrap{padding:80px 32px;max-width:1200px;margin:0 auto}
+  .arc-bookbox{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  .arc-bookbox__visual{aspect-ratio:4/3;background:linear-gradient(145deg,rgba(178, 170, 187, 0.08),rgba(221, 194, 159, 0.04));border:1px solid var(--border-subtle);border-radius:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .arc-bookbox__visual::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(178, 170, 187, 0.06),transparent 70%)}
+  .arc-bookbox__visual img{max-width:70%;max-height:85%;object-fit:contain;position:relative;z-index:1;border-radius:8px}
+  .arc-bookbox__visual-emoji{font-size:64px;position:relative;z-index:1}
+  .arc-bookbox__overline{font-family:var(--font-body) !important;font-size:12px !important;letter-spacing:0.2em !important;text-transform:uppercase !important;color:var(--accent-primary) !important;margin-bottom:12px !important}
+  .arc-bookbox__title{font-family:var(--font-heading) !important;font-size:clamp(1.6rem,3vw,2.2rem) !important;color:var(--text-heading) !important;margin-bottom:16px !important;font-weight:normal !important;line-height:1.2 !important}
+  .arc-bookbox__desc{font-family:var(--font-body) !important;font-size:16px !important;color:var(--text-muted) !important;line-height:1.7 !important;margin-bottom:12px !important}
+  .arc-bookbox__includes{list-style:none !important;padding:0 !important;margin:0 0 24px !important}
+  .arc-bookbox__includes li{font-family:var(--font-body) !important;font-size:15px !important;color:var(--text-body) !important;padding:6px 0 6px 24px !important;position:relative !important;border-bottom:1px solid var(--border-subtle) !important;display:block !important}
+  .arc-bookbox__includes li::before{content:'🌿' !important;position:absolute !important;left:0 !important;font-size:12px !important;top:8px !important}
+  .arc-bookbox__price{font-family:var(--font-body) !important;font-size:28px !important;color:var(--text-heading) !important;margin-bottom:20px !important}
+  .arc-bookbox__price span{font-size:16px !important;color:var(--text-tertiary) !important;margin-left:8px !important}
+  .arc-bookbox__cta{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body) !important;font-size:16px !important;padding:14px 32px;border-radius:8px;background:var(--accent-primary);color:var(--bg-primary);border:1px solid var(--accent-primary);text-decoration:none;transition:all .3s cubic-bezier(0.4,0,0.2,1)}
+  .arc-bookbox__cta:hover{box-shadow:0 8px 24px rgba(221, 194, 159, 0.35);transform:translateY(-2px)}
+  .arc-bookbox__note{font-family:var(--font-body) !important;font-size:16px !important;color:var(--accent-primary) !important;margin-top:16px !important;font-style:italic !important}
+  @media(max-width:768px){.arc-bookbox{grid-template-columns:1fr;gap:32px}.arc-bookbox-wrap{padding:56px 20px}}
+</style>
+
+<div class="arc-bookbox-wrap">
+  <div class="arc-bookbox">
+    <div class="arc-bookbox__visual">
+      {%- if section.settings.image != blank -%}
+        <img src="{{ section.settings.image | image_url: width: 600 }}" alt="{{ section.settings.title }}" loading="lazy">
+      {%- else -%}
+        <span class="arc-bookbox__visual-emoji">📦✨</span>
+      {%- endif -%}
+    </div>
+    <div class="arc-bookbox__content">
+      <div class="arc-bookbox__overline">{{ section.settings.overline | default: 'May Book Box · Available May 7th' }}</div>
+      <h2 class="arc-bookbox__title">{{ section.settings.title | default: 'Blood Bound' }}</h2>
+      <p class="arc-bookbox__desc">{{ section.settings.description | default: "This month's Court pick is <strong>Blood Bound</strong> — a darkly romantic tale that will have your House debating loyalties all season. Available from May 7th, the day of release. Get it before anyone else." }}</p>
+      <ul class="arc-bookbox__includes">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'include_item' -%}
+            <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+      <div class="arc-bookbox__price">{{ section.settings.price | default: '€29,90' }}</div>
+      {%- if section.settings.cta_text != blank -%}
+        <a class="arc-bookbox__cta" href="{{ section.settings.cta_url }}">{{ section.settings.cta_text }}</a>
+      {%- endif -%}
+      {%- if section.settings.note != blank -%}
+        <p class="arc-bookbox__note">{{ section.settings.note }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Book Box",
+  "tag": "section",
+  "class": "arc-section-book-box",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Box image" },
+    { "type": "text", "id": "overline", "label": "Overline", "default": "May Book Box · Available May 7th" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Blood Bound" },
+    { "type": "html", "id": "description", "label": "Description", "default": "This month's Court pick is <strong>Blood Bound</strong> — a darkly romantic tale that will have your House debating loyalties all season. Available from May 7th, the day of release." },
+    { "type": "text", "id": "price", "label": "Price", "default": "€29,90" },
+    { "type": "text", "id": "cta_text", "label": "Button text", "default": "Get This Month's Box →" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+    { "type": "text", "id": "note", "label": "Note (below button)", "default": "📖 Author talk coming in June — discuss Blood Bound live with the Court. Date TBA." }
+  ],
+  "blocks": [
+    { "type": "include_item", "name": "Includes", "settings": [
+      { "type": "text", "id": "text", "label": "Item text", "default": "One curated book" }
+    ]}
+  ],
+  "presets": [{
+    "name": "Book Box",
+    "blocks": [
+      { "type": "include_item", "settings": { "text": "Blood Bound — fresh off release day (May 7th)" } },
+      { "type": "include_item", "settings": { "text": "Signed bookplate exclusive to the Court" } },
+      { "type": "include_item", "settings": { "text": "3 exclusive themed goodies" } },
+      { "type": "include_item", "settings": { "text": "House points bonus (+40 pts)" } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,94 @@
+{%- comment -%}
+  A ROMANCE COURT — Upcoming Events
+  Section: arc-events
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; background:var(--bg-surface) !important; }
+  .arc-events-wrap{padding:72px 32px;max-width:1200px;margin:0 auto}
+  .arc-events__overline{font-family:var(--font-body) !important;font-size:12px !important;letter-spacing:0.2em !important;text-transform:uppercase !important;color:var(--accent-primary) !important;margin-bottom:8px !important;text-align:center !important}
+  .arc-events__title{font-family:var(--font-heading) !important;font-size:clamp(1.6rem,3vw,2.4rem) !important;text-align:center !important;margin-bottom:8px !important;font-weight:normal !important;color:var(--text-heading) !important}
+  .arc-events__desc{font-family:var(--font-body) !important;font-size:16px !important;color:var(--text-muted) !important;text-align:center !important;max-width:500px !important;margin:0 auto 40px !important;line-height:1.6 !important}
+  .arc-events__grid{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:20px !important}
+  .arc-event-card{background:var(--bg-elevated) !important;border:1px solid var(--border-subtle) !important;border-radius:12px !important;padding:28px 24px !important;transition:all .35s !important;position:relative !important;overflow:hidden !important;text-decoration:none !important;display:block !important;color:inherit !important}
+  .arc-event-card:hover{transform:translateY(-3px) !important;box-shadow:0 12px 32px rgba(21, 29, 44, 0.06) !important}
+  .arc-event-card::before{content:'' !important;position:absolute !important;top:0 !important;left:0 !important;right:0 !important;height:3px !important;background:linear-gradient(90deg,var(--accent-primary),var(--accent-primary)) !important;opacity:0 !important;transition:opacity .3s !important;display:block !important}
+  .arc-event-card:hover::before{opacity:1 !important}
+  .arc-event-card__date{font-family:var(--font-body) !important;font-size:12px !important;letter-spacing:0.12em !important;text-transform:uppercase !important;color:var(--accent-primary) !important;margin-bottom:10px !important}
+  .arc-event-card__title{font-family:var(--font-heading) !important;font-size:18px !important;color:var(--text-heading) !important;margin-bottom:8px !important;font-weight:normal !important}
+  .arc-event-card__desc{font-family:var(--font-body) !important;font-size:14px !important;color:var(--text-muted) !important;line-height:1.6 !important;margin-bottom:14px !important}
+  .arc-event-card__tag{font-family:var(--font-body) !important;font-size:11px !important;padding:3px 10px !important;border-radius:4px !important;display:inline-block !important}
+  .arc-event-card__tag--free{background:rgba(178, 170, 187, 0.1) !important;color:var(--accent-primary) !important}
+  .arc-event-card__tag--paid{background:rgba(221, 194, 159, 0.1) !important;color:var(--accent-primary) !important}
+  .arc-events__cta{text-align:center !important;margin-top:32px !important}
+  .arc-events__cta-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body) !important;font-size:16px !important;padding:14px 32px;border-radius:8px;background:transparent;color:var(--text-heading);border:1px solid var(--border-default);text-decoration:none;transition:all .3s cubic-bezier(0.4,0,0.2,1)}
+  .arc-events__cta-btn:hover{background:var(--bg-surface)}
+  @media(max-width:768px){.arc-events__grid{grid-template-columns:1fr !important}.arc-events-wrap{padding:56px 20px}}
+</style>
+
+<div class="arc-events-wrap">
+  <div class="arc-events__overline">{{ section.settings.overline | default: "What's Happening" }}</div>
+  <div class="arc-events__title">{{ section.settings.heading | default: 'Upcoming Events' }}</div>
+  <div class="arc-events__desc">{{ section.settings.description | default: 'From Open Court to author signings — the Court never sleeps.' }}</div>
+
+  <div class="arc-events__grid">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'event' -%}
+        <a class="arc-event-card" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="arc-event-card__date">{{ block.settings.date }}</div>
+          <div class="arc-event-card__title">{{ block.settings.title }}</div>
+          <div class="arc-event-card__desc">{{ block.settings.description }}</div>
+          {%- if block.settings.tag != blank -%}
+            <span class="arc-event-card__tag arc-event-card__tag--{{ block.settings.tag_style | default: 'free' }}">{{ block.settings.tag }}</span>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if section.settings.cta_text != blank -%}
+    <div class="arc-events__cta">
+      <a class="arc-events__cta-btn" href="{{ section.settings.cta_url }}">{{ section.settings.cta_text }}</a>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Events Grid",
+  "tag": "section",
+  "class": "arc-section-events",
+  "settings": [
+    { "type": "text", "id": "overline", "label": "Overline", "default": "What's Happening" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Upcoming Events" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "From Open Court to author signings — the Court never sleeps." },
+    { "type": "text", "id": "cta_text", "label": "Button text", "default": "See All Events →" },
+    { "type": "url", "id": "cta_url", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "event",
+      "name": "Event",
+      "settings": [
+        { "type": "text", "id": "date", "label": "Date & time", "default": "Wed, May 7 · 18:30" },
+        { "type": "text", "id": "title", "label": "Event name", "default": "Open Court" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Our weekly book club without a book." },
+        { "type": "text", "id": "tag", "label": "Tag text", "default": "Free" },
+        { "type": "select", "id": "tag_style", "label": "Tag style", "options": [
+          { "value": "free", "label": "Green (Free)" },
+          { "value": "paid", "label": "Gold (Paid)" }
+        ], "default": "free" },
+        { "type": "url", "id": "url", "label": "Event link" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Events Grid",
+    "blocks": [
+      { "type": "event", "settings": { "date": "Wed, May 7 · 18:30", "title": "Open Court", "description": "Our weekly book club without a book. Come read, chat, and connect with the Court.", "tag": "Free", "tag_style": "free" } },
+      { "type": "event", "settings": { "date": "Sat, May 10 · 17:00", "title": "Author Visit: Ana Huang", "description": "Meet the queen of Twisted Love. Book signing + exclusive Q&A with the Court.", "tag": "Free · RSVP", "tag_style": "free" } },
+      { "type": "event", "settings": { "date": "Fri, May 16 · 19:00", "title": "Romantasy Game Night", "description": "Houses compete. Points are earned. Trivia, challenges, and prizes.", "tag": "€5 · Members", "tag_style": "paid" } }
+    ]
+  }]
+}
+{% endschema %}

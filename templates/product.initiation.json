@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "arc-initiation-product",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

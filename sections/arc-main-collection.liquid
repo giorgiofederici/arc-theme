@@ -1,0 +1,385 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Collection Page
+  Section: arc-main-collection
+  ════════════════════════════════════════════════
+  Custom collection template with:
+  - Clean centered header (no dark banner)
+  - Wider 4-column product grid
+  - Floating book cards with museum plaques
+  - Filters & sort toolbar
+  ════════════════════════════════════════════════
+  
+  SETUP:
+  1. Upload to sections/
+  2. Create templates/collection.arc.json with:
+     { "sections": { "main": { "type": "arc-main-collection" } }, "order": ["main"] }
+  3. In Shopify admin, assign "arc" template to your collections
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign products_per_page = section.settings.products_per_page | default: 24
+  assign columns = section.settings.columns | default: 4
+-%}
+
+<style>
+  /* Reset Dawn wrapper */
+  #shopify-section-{{ section.id }} {
+    background: var(--bg-primary) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ═══ COLLECTION HEADER ═══ */
+  .arc-coll-header {
+    padding: 48px 32px 40px !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+  .arc-coll-header__overline {
+    font-family: var(--font-body) !important;
+    font-size: 12px !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--accent-primary) !important;
+    margin-bottom: 8px !important;
+  }
+  .arc-coll-header__title {
+    font-family: var(--font-heading) !important;
+    font-size: clamp(2rem, 4vw, 2.8rem) !important;
+    color: var(--text-heading) !important;
+    margin: 0 0 12px !important;
+    font-weight: normal !important;
+    line-height: 1.15 !important;
+  }
+  .arc-coll-header__desc {
+    font-family: var(--font-body) !important;
+    font-size: 16px !important;
+    color: var(--text-muted) !important;
+    max-width: 560px !important;
+    margin: 0 auto 24px !important;
+    line-height: 1.6 !important;
+  }
+  .arc-coll-header__meta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    color: var(--text-tertiary) !important;
+  }
+  .arc-coll-header__count {
+    background: var(--bg-surface) !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+  }
+  .arc-coll-header__sorted {
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    color: var(--text-tertiary) !important;
+  }
+  .arc-coll-divider {
+    width: 100% !important;
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    height: 1px !important;
+    background: var(--border-subtle) !important;
+  }
+
+  /* ═══ TOOLBAR ═══ */
+  .arc-coll-toolbar {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+    padding: 16px 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .arc-coll-toolbar__filters {
+    display: flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+  .arc-coll-filter {
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--bg-elevated) !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    transition: border-color 0.2s !important;
+  }
+  .arc-coll-filter:hover {
+    border-color: var(--border-default) !important;
+  }
+  .arc-coll-toolbar__right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+  .arc-coll-sort {
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--bg-elevated) !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    -webkit-appearance: none !important;
+  }
+
+  /* ═══ PRODUCT GRID ═══ */
+  .arc-coll-grid {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+    padding: 12px 32px 60px !important;
+    display: grid !important;
+    gap: 20px !important;
+  }
+  .arc-coll-grid--4 { grid-template-columns: repeat(4, 1fr) !important; }
+  .arc-coll-grid--3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .arc-coll-grid--5 { grid-template-columns: repeat(5, 1fr) !important; }
+
+  /* ═══ PAGINATION ═══ */
+  .arc-coll-pagination {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+    padding: 0 32px 60px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  .arc-coll-pagination a,
+  .arc-coll-pagination span {
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    padding: 8px 14px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    transition: all 0.2s !important;
+  }
+  .arc-coll-pagination a {
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--bg-elevated) !important;
+  }
+  .arc-coll-pagination a:hover {
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+  }
+  .arc-coll-pagination .arc-coll-pagination--current {
+    color: var(--bg-primary) !important;
+    background: var(--accent-primary) !important;
+    border: 1px solid var(--accent-primary) !important;
+  }
+
+  /* ═══ EMPTY STATE ═══ */
+  .arc-coll-empty {
+    max-width: 1300px !important;
+    margin: 0 auto !important;
+    padding: 80px 32px !important;
+    text-align: center !important;
+  }
+  .arc-coll-empty__icon {
+    font-size: 48px !important;
+    margin-bottom: 16px !important;
+  }
+  .arc-coll-empty__title {
+    font-family: var(--font-heading) !important;
+    font-size: 24px !important;
+    color: var(--text-heading) !important;
+    margin-bottom: 8px !important;
+    font-weight: normal !important;
+  }
+  .arc-coll-empty__desc {
+    font-family: var(--font-body) !important;
+    font-size: 16px !important;
+    color: var(--text-muted) !important;
+  }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 1024px) {
+    .arc-coll-grid--4, .arc-coll-grid--5 { grid-template-columns: repeat(3, 1fr) !important; }
+  }
+  @media (max-width: 768px) {
+    .arc-coll-header { padding: 36px 20px 28px !important; }
+    .arc-coll-toolbar { padding: 12px 20px !important; flex-wrap: wrap !important; gap: 12px !important; }
+    .arc-coll-grid { padding: 12px 20px 48px !important; }
+    .arc-coll-grid--4, .arc-coll-grid--5, .arc-coll-grid--3 { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+  @media (max-width: 480px) {
+    .arc-coll-grid--4, .arc-coll-grid--5, .arc-coll-grid--3 { grid-template-columns: 1fr !important; max-width: 320px !important; margin: 0 auto !important; }
+  }
+</style>
+
+{%- comment -%} ── Collection Header ── {%- endcomment -%}
+<div class="arc-coll-header">
+  <div class="arc-coll-header__overline">{{ section.settings.overline | default: 'Browse the Collection' }}</div>
+  <h1 class="arc-coll-header__title">{{ collection.title }}</h1>
+  {%- if collection.description != blank -%}
+    <div class="arc-coll-header__desc">{{ collection.description }}</div>
+  {%- endif -%}
+  <div class="arc-coll-header__meta">
+    <span class="arc-coll-header__count">{{ collection.products_count }} {{ section.settings.count_label | default: 'items' }}</span>
+    <span class="arc-coll-header__sorted">Sorted by {{ collection.sort_by | default: collection.default_sort_by | replace: 'best-selling', 'best selling' | replace: 'price-ascending', 'price (low to high)' | replace: 'price-descending', 'price (high to low)' | replace: 'title-ascending', 'A–Z' | replace: 'title-descending', 'Z–A' | replace: 'created-descending', 'newest' | replace: 'created-ascending', 'oldest' | replace: 'manual', 'featured' }}</span>
+  </div>
+</div>
+<div class="arc-coll-divider"></div>
+
+{%- comment -%} ── Toolbar ── {%- endcomment -%}
+<div class="arc-coll-toolbar">
+  <div class="arc-coll-toolbar__filters">
+    {%- for filter in collection.filters -%}
+      {%- comment -%} Skip price filters {%- endcomment -%}
+      {%- if filter.type == 'price_range' -%}{%- continue -%}{%- endif -%}
+      <details class="arc-coll-filter-wrap" style="position:relative">
+        <summary class="arc-coll-filter">
+          {{ filter.label }} ▾
+        </summary>
+        <div style="position:absolute;top:100%;left:0;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:8px;padding:12px;margin-top:4px;z-index:10;min-width:180px;box-shadow:0 8px 24px rgba(21, 29, 44, 0.08)">
+          {%- for value in filter.values -%}
+            <label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-family:var(--font-body);font-size:14px;color:var(--text-body);cursor:pointer">
+              <input
+                type="checkbox"
+                name="{{ value.param_name }}"
+                value="{{ value.value }}"
+                {% if value.active %}checked{% endif %}
+                onchange="window.location.href=this.checked ? '{{ value.url }}' : '{{ value.url_to_remove }}'"
+                style="accent-color:#DDC29F"
+              >
+              {{ value.label }} <span style="color:var(--text-tertiary);font-size:12px">({{ value.count }})</span>
+            </label>
+          {%- endfor -%}
+        </div>
+      </details>
+    {%- endfor -%}
+  </div>
+  <div class="arc-coll-toolbar__right">
+    <select class="arc-coll-sort" onchange="window.location.href=this.value">
+      {%- for option in collection.sort_options -%}
+        <option value="{{ collection.url }}?sort_by={{ option.value }}" {% if collection.sort_by == option.value %}selected{% endif %}>
+          {{ option.name }}
+        </option>
+      {%- endfor -%}
+    </select>
+  </div>
+</div>
+
+{%- comment -%} ── Product Grid ── {%- endcomment -%}
+{%- paginate collection.products by products_per_page -%}
+  {%- if collection.products.size > 0 -%}
+    {%- comment -%} Separate available and sold out products {%- endcomment -%}
+    {%- assign available_products = '' -%}
+    {%- assign soldout_products = '' -%}
+    {%- for product in collection.products -%}
+      {%- if product.available -%}
+        {%- if available_products == '' -%}
+          {%- assign available_products = product.id -%}
+        {%- else -%}
+          {%- assign available_products = available_products | append: ',' | append: product.id -%}
+        {%- endif -%}
+      {%- else -%}
+        {%- if soldout_products == '' -%}
+          {%- assign soldout_products = product.id -%}
+        {%- else -%}
+          {%- assign soldout_products = soldout_products | append: ',' | append: product.id -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    <div class="arc-coll-grid arc-coll-grid--{{ columns }}">
+      {%- comment -%} Available products first {%- endcomment -%}
+      {%- for product in collection.products -%}
+        {%- if product.available -%}
+          {%- render 'arc-product-card', product: product, lazy_load: true -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- comment -%} Sold out products at the bottom {%- endcomment -%}
+      {%- for product in collection.products -%}
+        {%- unless product.available -%}
+          {%- render 'arc-product-card', product: product, lazy_load: true -%}
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ── Pagination ── {%- endcomment -%}
+    {%- if paginate.pages > 1 -%}
+      <div class="arc-coll-pagination">
+        {%- if paginate.previous -%}
+          <a href="{{ paginate.previous.url }}">&larr; Prev</a>
+        {%- endif -%}
+        {%- for part in paginate.parts -%}
+          {%- if part.is_link -%}
+            <a href="{{ part.url }}">{{ part.title }}</a>
+          {%- else -%}
+            <span class="arc-coll-pagination--current">{{ part.title }}</span>
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if paginate.next -%}
+          <a href="{{ paginate.next.url }}">Next &rarr;</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  {%- else -%}
+    <div class="arc-coll-empty">
+      <div class="arc-coll-empty__icon">📚</div>
+      <div class="arc-coll-empty__title">No books found</div>
+      <div class="arc-coll-empty__desc">Try adjusting your filters or browse all collections.</div>
+    </div>
+  {%- endif -%}
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Collection Grid",
+  "tag": "section",
+  "class": "arc-section-collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline text",
+      "default": "Browse the Collection"
+    },
+    {
+      "type": "text",
+      "id": "count_label",
+      "label": "Count label",
+      "default": "items",
+      "info": "Text after the number, e.g. 'books', 'items', 'events'"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Grid columns",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "default": "4"
+    }
+  ]
+}
+{% endschema %}

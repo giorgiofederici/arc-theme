@@ -1,0 +1,104 @@
+{%- comment -%}
+  A ROMANCE COURT — Merch Grid
+  Section: arc-merch
+  Deep navy background
+{%- endcomment -%}
+
+<style>
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; background:var(--arc-navy-deep) !important; }
+  .arc-merch-wrap{padding:72px 32px;max-width:1200px;margin:0 auto}
+  .arc-merch__overline{font-family:var(--font-body) !important;font-size:12px !important;letter-spacing:0.2em !important;text-transform:uppercase !important;color:var(--accent-glow) !important;margin-bottom:8px !important;text-align:center !important}
+  .arc-merch__title{font-family:var(--font-heading) !important;font-size:clamp(1.6rem,3vw,2.4rem) !important;text-align:center !important;margin-bottom:8px !important;font-weight:normal !important;color:#F1E1DD !important}
+  .arc-merch__desc{font-family:var(--font-body) !important;font-size:16px !important;color:rgba(241, 225, 221, 0.5) !important;text-align:center !important;max-width:540px !important;margin:0 auto 40px !important;line-height:1.6 !important}
+  .arc-merch__grid{display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:16px !important}
+  .arc-merch-card{background:rgba(241, 225, 221, 0.03) !important;border:1px solid rgba(178, 170, 187, 0.12) !important;border-radius:12px !important;overflow:hidden !important;transition:all .35s cubic-bezier(0.4,0,0.2,1) !important;text-decoration:none !important;display:block !important;color:inherit !important}
+  .arc-merch-card:hover{transform:translateY(-4px) !important;border-color:rgba(178, 170, 187, 0.3) !important;box-shadow:0 12px 32px rgba(21, 29, 44, 0.2) !important}
+  .arc-merch-card__img{aspect-ratio:1/1;background:rgba(178, 170, 187, 0.06);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+  .arc-merch-card__img img{width:100%;height:100%;object-fit:cover}
+  .arc-merch-card__badge{position:absolute;top:10px;left:10px;font-family:var(--font-body) !important;font-size:10px !important;letter-spacing:0.1em !important;text-transform:uppercase !important;background:var(--accent-primary) !important;color:#151D2C !important;padding:3px 8px !important;border-radius:4px !important;z-index:2}
+  .arc-merch-card__body{padding:14px 16px;text-align:center}
+  .arc-merch-card__name{font-family:var(--font-heading) !important;font-size:16px !important;color:#F1E1DD !important;margin-bottom:4px !important}
+  .arc-merch-card__desc{font-family:var(--font-body) !important;font-size:13px !important;color:rgba(241, 225, 221, 0.4) !important;margin-bottom:6px !important}
+  .arc-merch-card__price{font-family:var(--font-body) !important;font-size:15px !important;color:var(--accent-glow) !important}
+  .arc-merch__cta{text-align:center !important;margin-top:32px !important}
+  .arc-merch__cta-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body) !important;font-size:16px !important;padding:14px 32px;border-radius:8px;background:transparent;color:var(--accent-glow);border:1px solid rgba(178, 170, 187, 0.2);text-decoration:none;transition:all .3s cubic-bezier(0.4,0,0.2,1)}
+  .arc-merch__cta-btn:hover{border-color:var(--accent-glow);box-shadow:0 8px 24px rgba(178, 170, 187, 0.2)}
+  @media(max-width:768px){.arc-merch__grid{grid-template-columns:repeat(2,1fr) !important}.arc-merch-wrap{padding:56px 20px}}
+</style>
+
+<div class="arc-merch-wrap">
+  <div class="arc-merch__overline">{{ section.settings.overline | default: 'Court Merchandise' }}</div>
+  <div class="arc-merch__title">{{ section.settings.heading | default: 'Made for the Court' }}</div>
+  <div class="arc-merch__desc">{{ section.settings.description | default: 'Candles that smell like your favorite tropes, totes for your book hauls, and tees that tell the world which House you belong to.' }}</div>
+
+  <div class="arc-merch__grid">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'product' -%}
+        {%- assign prod = all_products[block.settings.product] -%}
+        <a class="arc-merch-card" href="{{ prod.url | default: '#' }}" {{ block.shopify_attributes }}>
+          <div class="arc-merch-card__img">
+            {%- if block.settings.badge != blank -%}
+              <span class="arc-merch-card__badge">{{ block.settings.badge }}</span>
+            {%- endif -%}
+            {%- if prod.featured_image != blank -%}
+              <img src="{{ prod.featured_image | image_url: width: 400 }}" alt="{{ prod.title }}" loading="lazy">
+            {%- else -%}
+              {{ block.settings.emoji | default: '🛍' }}
+            {%- endif -%}
+          </div>
+          <div class="arc-merch-card__body">
+            <div class="arc-merch-card__name">{{ block.settings.custom_title | default: prod.title | default: 'Product' }}</div>
+            {%- if block.settings.subtitle != blank -%}
+              <div class="arc-merch-card__desc">{{ block.settings.subtitle }}</div>
+            {%- endif -%}
+            <div class="arc-merch-card__price">{{ prod.price | money | default: block.settings.custom_price }}</div>
+          </div>
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if section.settings.cta_text != blank -%}
+    <div class="arc-merch__cta">
+      <a class="arc-merch__cta-btn" href="{{ section.settings.cta_url }}">{{ section.settings.cta_text }}</a>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Merch Grid",
+  "tag": "section",
+  "class": "arc-section-merch",
+  "settings": [
+    { "type": "text", "id": "overline", "label": "Overline", "default": "Court Merchandise" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Made for the Court" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Candles that smell like your favorite tropes, totes for your book hauls, and tees that tell the world which House you belong to." },
+    { "type": "text", "id": "cta_text", "label": "Button text", "default": "View All Merch →" },
+    { "type": "url", "id": "cta_url", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "custom_title", "label": "Custom title", "info": "Overrides product title" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "info": "Short description under title" },
+        { "type": "text", "id": "custom_price", "label": "Custom price", "info": "Fallback if no product selected" },
+        { "type": "text", "id": "badge", "label": "Badge", "info": "e.g. New, Hot, Limited" },
+        { "type": "text", "id": "emoji", "label": "Emoji fallback", "default": "🛍", "info": "Shown if no product image" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Merch Grid",
+    "blocks": [
+      { "type": "product", "settings": { "custom_title": "Court Candle — Fae Bargain", "subtitle": "Night jasmine, moss & old books", "custom_price": "€18,00", "badge": "New", "emoji": "🕯️" } },
+      { "type": "product", "settings": { "custom_title": "Court Candle — Morally Grey", "subtitle": "Cedar, leather & a hint of danger", "custom_price": "€18,00", "badge": "New", "emoji": "🕯️" } },
+      { "type": "product", "settings": { "custom_title": "Court Tote Bag", "subtitle": "Canvas, embroidered crest", "custom_price": "€15,00", "emoji": "👜" } },
+      { "type": "product", "settings": { "custom_title": "House Tee — All 4 Houses", "subtitle": "Rep your allegiance", "custom_price": "€24,00", "emoji": "👕" } }
+    ]
+  }]
+}
+{% endschema %}

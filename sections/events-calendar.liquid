@@ -1,0 +1,378 @@
+{%- comment -%}
+  ============================================================
+  A ROMANCE COURT — Events Calendar (tabbed collection section)
+  ------------------------------------------------------------
+  Reusable, tag-driven calendar. Drop this section onto ANY
+  collection page. It builds tabs automatically from a product
+  tag prefix and filters the cards instantly (no page reload).
+
+  HOW IT WORKS
+  - Tag each event product:  month-2026-08   → tab "August 2026"
+  - (optional) exact date:   date-2026-08-07 → day badge "07 AUG"
+  - (optional) house:        house-blood-ruby → pill "Blood Ruby"
+  - eyebrow on each card    = the product's Type (Shopify field)
+
+  SOLD OUT
+  - A card is marked "Sold out" automatically when the product
+    has no inventory available (product.available == false).
+    Nothing to tag by hand — Shopify handles it as tickets sell.
+
+  REUSE IT
+  - Change "Tab tag prefix" in the section settings from
+    month-  to  house-  or  format-  and the same section
+    becomes a Houses / format calendar. One section, many uses.
+
+  PORTABLE: this file works on your current theme and drops
+  into the Dwell theme unchanged (both are Online Store 2.0).
+  ============================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign prefix       = section.settings.tab_tag_prefix
+  assign date_prefix  = section.settings.date_tag_prefix
+  assign house_prefix = section.settings.house_tag_prefix
+  assign plen  = prefix | size
+  assign dlen  = date_prefix | size
+  assign hlen  = house_prefix | size
+
+  # ── collect the unique, sorted tab values from product tags ──
+  assign vals = ''
+  if plen > 0
+    for product in collection.products
+      for tag in product.tags
+        assign head = tag | slice: 0, plen
+        if head == prefix
+          assign v = tag | remove_first: prefix
+          assign vals = vals | append: v | append: '|'
+        endif
+      endfor
+    endfor
+  endif
+  assign tab_list = vals | split: '|' | uniq | sort
+  assign total = collection.products.size
+-%}
+
+<section
+  class="arc-cal"
+  style="--cols:{{ section.settings.columns_desktop }};"
+  id="arc-cal-{{ section.id }}">
+
+  {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+  <header class="arc-cal__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="arc-cal__eyebrow">{{ section.settings.eyebrow }}</span>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="arc-cal__title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="arc-cal__lede">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+  </header>
+  {%- endif -%}
+
+  {%- comment -%} ── Tab bar ── {%- endcomment -%}
+  <div class="arc-cal__tabs-shell">
+    <div class="arc-cal__tabs" role="tablist" aria-label="Filter by {{ section.settings.filter_noun | escape }}">
+      {%- if section.settings.show_all_tab -%}
+        <button class="arc-cal__tab" role="tab" aria-selected="true" data-key="all" data-label="{{ section.settings.all_tab_label | escape }}">
+          {{ section.settings.all_tab_label }}<span class="arc-cal__count">{{ total }}</span>
+        </button>
+      {%- endif -%}
+
+      {%- for value in tab_list -%}
+        {%- liquid
+          assign parts = value | split: '-'
+          assign firstpart = parts[0]
+          assign flen = firstpart | size
+          if parts.size >= 2 and flen == 4
+            assign label = value | append: '-01' | date: '%B %Y'
+          else
+            assign label_words = value | split: '-'
+            assign label = ''
+            for lw in label_words
+              assign lwc = lw | capitalize
+              assign label = label | append: lwc | append: ' '
+            endfor
+            assign label = label | strip
+          endif
+          assign full_tag = prefix | append: value
+          assign cnt = 0
+          for product in collection.products
+            if product.tags contains full_tag
+              assign cnt = cnt | plus: 1
+            endif
+          endfor
+        -%}
+        <button class="arc-cal__tab" role="tab" aria-selected="false" data-key="{{ value | escape }}" data-label="{{ label | escape }}">
+          {{ label }}<span class="arc-cal__count">{{ cnt }}</span>
+        </button>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} ── Grid header ── {%- endcomment -%}
+  <div class="arc-cal__grid-head">
+    <h3 class="arc-cal__grid-title" data-all-label="{{ section.settings.all_heading | escape }}">{{ section.settings.all_heading }}</h3>
+    <span class="arc-cal__meta"></span>
+  </div>
+
+  {%- comment -%} ── Cards ── {%- endcomment -%}
+  <div class="arc-cal__grid">
+    {%- for product in collection.products -%}
+      {%- liquid
+        # this product's tab values (space separated → data attribute)
+        assign ptabs = ''
+        for tag in product.tags
+          assign head = tag | slice: 0, plen
+          if head == prefix
+            assign pv = tag | remove_first: prefix
+            assign ptabs = ptabs | append: pv | append: ' '
+          endif
+        endfor
+        assign ptabs = ptabs | strip
+
+        # exact date tag → day badge
+        assign has_date = false
+        assign dval = ''
+        for tag in product.tags
+          assign dhead = tag | slice: 0, dlen
+          if dlen > 0 and dhead == date_prefix
+            assign dval = tag | remove_first: date_prefix
+            assign has_date = true
+          endif
+        endfor
+
+        # house tag → pill
+        assign house = ''
+        for tag in product.tags
+          assign hhead = tag | slice: 0, hlen
+          if hlen > 0 and hhead == house_prefix
+            assign house_raw = tag | remove_first: house_prefix
+            assign house_words = house_raw | split: '-'
+            assign house = ''
+            for hw in house_words
+              assign hwc = hw | capitalize
+              assign house = house | append: hwc | append: ' '
+            endfor
+            assign house = house | strip
+          endif
+        endfor
+
+        # badge values
+        assign badge_day = ''
+        assign badge_mon = ''
+        if has_date
+          assign badge_day = dval | date: '%d'
+          assign badge_mon = dval | date: '%b'
+        else
+          assign firsttab = ptabs | split: ' ' | first
+          assign fparts = firsttab | split: '-'
+          if fparts.size >= 2
+            assign monkey = firsttab | append: '-01'
+            assign badge_mon = monkey | date: '%b'
+          endif
+        endif
+
+        # sold-out state — true when Shopify has no inventory available
+        assign is_sold_out = false
+        unless product.available
+          assign is_sold_out = true
+        endunless
+      -%}
+      <article class="arc-cal__card{% if is_sold_out %} is-sold-out{% endif %}" data-tabs="{{ ptabs }}" data-available="{{ product.available }}">
+        <a class="arc-cal__card-link" href="{{ product.url }}">
+          <div class="arc-cal__media">
+            {%- if product.featured_media -%}
+              {{ product.featured_media | image_url: width: 700 | image_tag: loading: 'lazy', class: 'arc-cal__img', alt: product.title | escape }}
+            {%- else -%}
+              <div class="arc-cal__img arc-cal__img--placeholder"></div>
+            {%- endif -%}
+            {%- if is_sold_out and section.settings.show_sold_out -%}
+              <span class="arc-cal__soldout">{{ section.settings.sold_out_label }}</span>
+            {%- endif -%}
+            {%- if house != blank -%}<span class="arc-cal__house">{{ house }}</span>{%- endif -%}
+            {%- if badge_mon != blank -%}
+              <div class="arc-cal__date">
+                {%- if badge_day != blank -%}<span class="d">{{ badge_day }}</span>{%- endif -%}
+                <span class="m">{{ badge_mon }}</span>
+              </div>
+            {%- endif -%}
+          </div>
+          <div class="arc-cal__body">
+            {%- if product.type != blank -%}<span class="arc-cal__type">{{ product.type }}</span>{%- endif -%}
+            <h4 class="arc-cal__card-title">{{ product.title }}</h4>
+            {%- if section.settings.show_excerpt and product.description != blank -%}
+              <p class="arc-cal__desc">{{ product.description | strip_html | truncatewords: 24 }}</p>
+            {%- endif -%}
+            <div class="arc-cal__foot">
+              {%- if section.settings.show_price -%}
+                <span class="arc-cal__price">{{ product.price | money }}</span>
+              {%- else -%}
+                <span></span>
+              {%- endif -%}
+              {%- if is_sold_out and section.settings.show_sold_out -%}
+                <span class="arc-cal__cta arc-cal__cta--soldout">{{ section.settings.sold_out_label }}</span>
+              {%- else -%}
+                <span class="arc-cal__cta">{{ section.settings.cta_label }}</span>
+              {%- endif -%}
+            </div>
+          </div>
+        </a>
+      </article>
+    {%- endfor -%}
+
+    <div class="arc-cal__empty" hidden>
+      <div class="arc-cal__glyph">✦</div>
+      <p>{{ section.settings.empty_text }}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  #arc-cal-{{ section.id }}{
+    --arc-plum:#55294A;--arc-burgundy:#4D3239;--arc-navy:#273046;--arc-ink:#371D2B;
+    --arc-lavender:#B2AABB;--arc-blush:#F1E1DD;--arc-gold:#DDC29F;--arc-cream:#F1E1DD;
+    --cal-accent:#DDC29F;--cal-accent-soft:rgba(221, 194, 159, .15);
+    --primary:var(--cal-accent);
+    --primary-deep:color-mix(in srgb, var(--cal-accent) 58%, var(--arc-ink));
+    --ease:cubic-bezier(.4,0,.2,1);
+    font-family:var(--font-body);
+    color:var(--arc-ink);
+    padding:{{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+  }
+
+  #arc-cal-{{ section.id }} *{box-sizing:border-box}
+  .arc-cal__head{text-align:center;max-width:640px;margin:0 auto 8px;padding:0 20px}
+  .arc-cal__eyebrow{font-family:var(--font-heading);letter-spacing:.24em;font-size:.78rem;color:var(--primary-deep);opacity:.75;display:inline-flex;align-items:center;gap:.7em}
+  .arc-cal__eyebrow::before,.arc-cal__eyebrow::after{content:"";width:34px;height:1px;background:var(--arc-gold);display:inline-block}
+  .arc-cal__title{font-family:var(--font-heading);font-weight:500;font-size:clamp(2.2rem,5vw,3.4rem);color:var(--primary-deep);line-height:1.06;margin:.24em 0 .16em}
+  .arc-cal__lede{font-size:1.1rem;color:var(--arc-burgundy)}
+
+  .arc-cal__tabs-shell{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--arc-cream) 86%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid rgba(85, 41, 74, .1);margin-top:22px}
+  .arc-cal__tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:14px 20px;justify-content:center;max-width:1160px;margin:0 auto}
+  .arc-cal__tabs::-webkit-scrollbar{display:none}
+  .arc-cal__tab{font-family:var(--font-heading);letter-spacing:.14em;font-size:.8rem;color:var(--arc-burgundy);background:transparent;border:1px solid transparent;padding:9px 20px;border-radius:999px;white-space:nowrap;cursor:pointer;transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:.55em}
+  .arc-cal__count{font-size:.7rem;background:rgba(85, 41, 74, .1);color:var(--primary-deep);padding:1px 8px;border-radius:999px;letter-spacing:.05em}
+  .arc-cal__tab:hover{border-color:var(--arc-gold);color:var(--primary-deep)}
+  .arc-cal__tab[aria-selected="true"]{background:var(--primary-deep);color:var(--arc-blush);box-shadow:0 6px 18px -8px rgba(85, 41, 74, .6)}
+  .arc-cal__tab[aria-selected="true"] .arc-cal__count{background:var(--cal-accent-soft);color:var(--arc-blush)}
+  .arc-cal__tab[aria-selected="true"]::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cal-accent);box-shadow:0 0 8px var(--cal-accent)}
+
+  .arc-cal__grid-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;max-width:1160px;margin:0 auto;padding:34px 20px 18px;flex-wrap:wrap}
+  .arc-cal__grid-title{font-family:var(--font-heading);font-weight:500;font-size:1.8rem;color:var(--primary-deep);margin:0}
+  .arc-cal__meta{font-size:.9rem;color:var(--arc-burgundy);opacity:.8}
+
+  .arc-cal__grid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:26px;max-width:1160px;margin:0 auto;padding:0 20px}
+  @media(max-width:900px){.arc-cal__grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.arc-cal__grid{grid-template-columns:1fr}}
+
+  .arc-cal__card{background:#F1E1DD;border:1px solid rgba(85, 41, 74, .1);border-radius:14px;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s var(--ease)}
+  .arc-cal__card:hover{transform:translateY(-5px);box-shadow:0 22px 40px -22px rgba(55, 29, 43, .5);border-color:var(--arc-gold)}
+  .arc-cal__card[hidden]{display:none}
+  .arc-cal__card-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;height:100%}
+  .arc-cal__media{position:relative;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(135deg,var(--primary-deep),color-mix(in srgb,var(--cal-accent) 42%,var(--arc-ink)) 55%,var(--arc-ink))}
+  .arc-cal__img{width:100%;height:100%;object-fit:cover;display:block}
+  .arc-cal__img--placeholder{width:100%;height:100%}
+  .arc-cal__date{position:absolute;left:14px;bottom:14px;z-index:2;background:var(--arc-cream);border-radius:10px;text-align:center;padding:8px 12px;line-height:1;box-shadow:0 6px 16px -8px rgba(21, 29, 44, .5)}
+  .arc-cal__date .d{font-family:var(--font-heading);font-size:1.5rem;color:var(--primary-deep);font-weight:600;display:block}
+  .arc-cal__date .m{font-family:var(--font-heading);letter-spacing:.16em;font-size:.6rem;color:var(--arc-burgundy);margin-top:3px;display:block}
+  .arc-cal__house{position:absolute;top:14px;right:14px;z-index:2;text-transform:uppercase;letter-spacing:.12em;font-size:.6rem;color:var(--arc-cream);background:rgba(55, 29, 43, .5);backdrop-filter:blur(3px);padding:5px 10px;border-radius:999px;border:1px solid rgba(221, 194, 159, .4)}
+
+  /* ── Sold out ── */
+  .arc-cal__soldout{position:absolute;top:14px;left:14px;z-index:3;font-family:var(--font-heading);letter-spacing:.14em;font-size:.62rem;font-weight:600;color:var(--arc-cream);background:var(--arc-ink);padding:6px 12px;border-radius:999px;border:1px solid rgba(221, 194, 159, .5);box-shadow:0 6px 16px -8px rgba(21, 29, 44, .6)}
+  .arc-cal__card.is-sold-out .arc-cal__media{background:var(--arc-ink)}
+  .arc-cal__card.is-sold-out .arc-cal__img{filter:grayscale(.55) brightness(.82);opacity:.85}
+  .arc-cal__card.is-sold-out:hover{transform:none;box-shadow:0 22px 40px -26px rgba(55, 29, 43, .4)}
+  .arc-cal__cta--soldout{color:var(--arc-burgundy);border-color:rgba(85, 41, 74, .3);opacity:.75;pointer-events:none}
+  .arc-cal__card.is-sold-out:hover .arc-cal__cta--soldout{background:transparent;color:var(--arc-burgundy)}
+
+  .arc-cal__body{padding:20px 20px 22px;display:flex;flex-direction:column;flex:1}
+  .arc-cal__type{font-family:var(--font-heading);letter-spacing:.18em;font-size:.68rem;color:var(--cal-accent);margin-bottom:8px;font-weight:600}
+  .arc-cal__card-title{font-family:var(--font-heading);font-weight:600;font-size:1.35rem;color:var(--primary-deep);line-height:1.15;margin:0 0 8px}
+  .arc-cal__desc{font-size:.96rem;color:var(--arc-burgundy);flex:1;margin:0}
+  .arc-cal__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px}
+  .arc-cal__price{font-size:1rem;color:var(--primary-deep);font-weight:600}
+  .arc-cal__cta{text-transform:uppercase;letter-spacing:.13em;font-size:.72rem;color:var(--primary-deep);border:1px solid var(--primary-deep);padding:8px 16px;border-radius:999px;transition:all .25s var(--ease)}
+  .arc-cal__card:hover .arc-cal__cta{background:var(--primary-deep);color:var(--arc-blush)}
+
+  .arc-cal__empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--arc-burgundy)}
+  .arc-cal__empty[hidden]{display:none}
+  .arc-cal__glyph{font-family:var(--font-heading);font-size:2.6rem;color:var(--arc-gold)}
+  .arc-cal__empty p{max-width:420px;margin:10px auto 0}
+</style>
+
+<script>
+(function(){
+  var root = document.getElementById('arc-cal-{{ section.id }}');
+  if(!root) return;
+  var tabs  = root.querySelectorAll('.arc-cal__tab');
+  var cards = root.querySelectorAll('.arc-cal__card');
+  var titleEl = root.querySelector('.arc-cal__grid-title');
+  var metaEl  = root.querySelector('.arc-cal__meta');
+  var emptyEl = root.querySelector('.arc-cal__empty');
+  var allLabel = titleEl ? titleEl.getAttribute('data-all-label') : 'All';
+
+  function apply(key, label){
+    var shown = 0;
+    cards.forEach(function(card){
+      var list = (card.getAttribute('data-tabs')||'').split(/\s+/);
+      var match = key === 'all' || list.indexOf(key) !== -1;
+      card.hidden = !match;
+      if(match) shown++;
+    });
+    if(titleEl) titleEl.textContent = key === 'all' ? allLabel : label;
+    if(metaEl)  metaEl.textContent = shown + (shown === 1 ? ' gathering' : ' gatherings');
+    if(emptyEl) emptyEl.hidden = shown !== 0;
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.setAttribute('aria-selected', t === tab ? 'true':'false'); });
+      apply(tab.getAttribute('data-key'), tab.getAttribute('data-label'));
+    });
+  });
+
+  var initial = root.querySelector('.arc-cal__tab[aria-selected="true"]') || tabs[0];
+  if(initial) apply(initial.getAttribute('data-key'), initial.getAttribute('data-label'));
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Events calendar",
+  "tag": "section",
+  "class": "section arc-cal-section",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Court Convenes" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Events & Gatherings" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Choose your month — the Court is always assembling." },
+    { "type": "text", "id": "all_heading", "label": "Grid heading (All view)", "default": "All upcoming" },
+
+    { "type": "header", "content": "Tabs & filtering" },
+    { "type": "text", "id": "tab_tag_prefix", "label": "Tab tag prefix", "info": "Tags starting with this build the tabs. e.g. month- , house- , format-", "default": "month-" },
+    { "type": "text", "id": "date_tag_prefix", "label": "Exact-date tag prefix (optional)", "info": "e.g. date-2026-08-07 → day badge on the card", "default": "date-" },
+    { "type": "text", "id": "house_tag_prefix", "label": "House tag prefix (optional)", "info": "e.g. house-blood-ruby → pill on the card", "default": "house-" },
+    { "type": "checkbox", "id": "show_all_tab", "label": "Show 'All' tab", "default": true },
+    { "type": "text", "id": "all_tab_label", "label": "'All' tab label", "default": "All" },
+    { "type": "text", "id": "filter_noun", "label": "Accessible filter noun", "default": "month" },
+
+    { "type": "header", "content": "Card" },
+    { "type": "checkbox", "id": "show_excerpt", "label": "Show short description", "default": true },
+    { "type": "checkbox", "id": "show_price", "label": "Show price", "default": false },
+    { "type": "text", "id": "cta_label", "label": "Card button label", "default": "Reserve" },
+    { "type": "checkbox", "id": "show_sold_out", "label": "Show 'Sold out' when no tickets remain", "default": true },
+    { "type": "text", "id": "sold_out_label", "label": "Sold-out label", "default": "Sold out" },
+    { "type": "text", "id": "empty_text", "label": "Empty-month message", "default": "No gatherings held this month — the Court rests. Choose another month above." },
+
+    { "type": "header", "content": "Layout & style" },
+    { "type": "range", "id": "columns_desktop", "label": "Columns (desktop)", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "presets": [
+    { "name": "Events calendar" }
+  ]
+}
+{% endschema %}

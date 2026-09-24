@@ -1,0 +1,268 @@
+{%- comment -%}
+  ════════════════════════════════════════════════
+  A ROMANCE COURT — Image with Text
+  Section: arc-image-text
+  ════════════════════════════════════════════════
+  Reusable: Blind Date feature, campaign promo,
+  any image + text split layout.
+  ════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign layout = section.settings.layout | default: 'image-left'
+  assign bg_style = section.settings.bg_style | default: 'light'
+-%}
+
+<div
+  class="arc-it{% if bg_style == 'dark' %} arc-it--dark{% elsif bg_style == 'surface' %} arc-it--surface{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="arc-it__inner{% if layout == 'image-right' %} arc-it__inner--reverse{% endif %}">
+
+    {%- comment -%} ── Image ── {%- endcomment -%}
+    <div class="arc-it__image-wrap">
+      {%- if section.settings.image != blank -%}
+        <img
+          class="arc-it__image"
+          src="{{ section.settings.image | image_url: width: 800 }}"
+          alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}"
+          width="800"
+          height="auto"
+          loading="lazy"
+        >
+      {%- else -%}
+        <div class="arc-it__image-placeholder">
+          <span>Upload an image</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.badge != blank -%}
+        <div class="arc-it__badge">{{ section.settings.badge }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Text ── {%- endcomment -%}
+    <div class="arc-it__text">
+      {%- if section.settings.overline != blank -%}
+        <div class="arc-it__overline">{{ section.settings.overline }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="arc-it__title">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="arc-it__desc">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_text != blank -%}
+        <a
+          class="arc-btn arc-btn--{{ section.settings.cta_style | default: 'primary' }}"
+          href="{{ section.settings.cta_url }}"
+        >
+          {{ section.settings.cta_text }} <span class="arc-btn__arrow">&rarr;</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .arc-it {
+    padding: 56px 0;
+    background: var(--bg-primary);
+    overflow: hidden;
+  }
+  .arc-it--surface { background: var(--bg-surface); }
+  .arc-it--dark { background: var(--bg-dark); }
+
+  .arc-it__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .arc-it__inner--reverse {
+    direction: rtl;
+  }
+  .arc-it__inner--reverse > * {
+    direction: ltr;
+  }
+
+  .arc-it__image-wrap {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .arc-it__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .arc-it__image-wrap:hover .arc-it__image {
+    transform: scale(1.03);
+  }
+  .arc-it__image-placeholder {
+    aspect-ratio: 4 / 5;
+    background: var(--bg-surface);
+    border: 1px dashed var(--border-default);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 16.1px;
+    color: var(--text-tertiary);
+  }
+  .arc-it__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-family: var(--font-body);
+    font-size: 13.8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: var(--accent-secondary);
+    color: #F1E1DD;
+  }
+
+  .arc-it__text {
+    max-width: 460px;
+  }
+  .arc-it__overline {
+    font-family: var(--font-body);
+    font-size: 13.8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    margin-bottom: 12px;
+  }
+  .arc-it--dark .arc-it__overline {
+    color: var(--accent-primary);
+  }
+  .arc-it__title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.84rem, 3.45vw, 2.76rem);
+    color: var(--text-heading);
+    line-height: 1.15;
+    margin: 0 0 16px;
+    font-weight: normal;
+  }
+  .arc-it--dark .arc-it__title {
+    color: var(--text-on-dark);
+  }
+  .arc-it__desc {
+    font-family: var(--font-body);
+    font-size: 18.4px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .arc-it--dark .arc-it__desc {
+    color: var(--text-muted-on-dark);
+  }
+
+  @media (max-width: 768px) {
+    .arc-it { padding: 40px 0; }
+    .arc-it__inner {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding: 0 20px;
+    }
+    .arc-it__inner--reverse { direction: ltr; }
+    .arc-it__text { max-width: 100%; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Image with Text",
+  "tag": "section",
+  "class": "arc-section-image-text",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Image badge (optional)",
+      "info": "Small label on the image, e.g. 'Limited' or 'New'"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "image-left", "label": "Image left, text right" },
+        { "value": "image-right", "label": "Image right, text left" }
+      ],
+      "default": "image-left"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Overline"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Don't choose the book."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Tempt the Singularity"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "cta_style",
+      "label": "Button style",
+      "options": [
+        { "value": "primary", "label": "Primary (plum)" },
+        { "value": "secondary", "label": "Secondary (sand gold)" },
+        { "value": "ghost", "label": "Outline" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "bg_style",
+      "label": "Background",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with Text"
+    }
+  ]
+}
+{% endschema %}

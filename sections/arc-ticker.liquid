@@ -1,0 +1,49 @@
+{%- comment -%}
+  A ROMANCE COURT — Scrolling Ticker
+  Section: arc-ticker
+{%- endcomment -%}
+
+<style>
+
+  #shopify-section-{{ section.id }} { padding:0 !important; margin:0 !important; }
+  @keyframes arc-ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .arc-ticker{overflow:hidden;background:var(--arc-plum-dark);padding:12px 0}
+  .arc-ticker__track{display:flex;animation:arc-ticker-scroll 30s linear infinite;white-space:nowrap; align-items: center;}
+  .arc-ticker__item{font-family:var(--font-body) !important;font-size:14.95px!important;color:rgba(241, 225, 221, 0.6) !important;letter-spacing:0.15em !important;text-transform:uppercase !important;padding:0 40px;flex-shrink:0}
+  .arc-ticker__dot{color:var(--accent-glow) !important;padding:0 8px}
+</style>
+
+<div class="arc-ticker">
+  <div class="arc-ticker__track">
+    {%- for i in (1..2) -%}
+      {%- for block in section.blocks -%}
+        <span class="arc-ticker__item">{{ block.settings.text }}</span><span class="arc-ticker__dot">✦</span>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Ticker",
+  "tag": "section",
+  "class": "arc-section-ticker",
+  "settings": [],
+  "blocks": [
+    { "type": "ticker_item", "name": "Ticker item", "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Signed Editions" }
+    ]}
+  ],
+  "presets": [{
+    "name": "Ticker",
+    "blocks": [
+      { "type": "ticker_item", "settings": { "text": "Signed Editions" } },
+      { "type": "ticker_item", "settings": { "text": "Monthly Book Boxes" } },
+      { "type": "ticker_item", "settings": { "text": "Blind Dates with a Book" } },
+      { "type": "ticker_item", "settings": { "text": "Open Court Every Wednesday" } },
+      { "type": "ticker_item", "settings": { "text": "Four Houses · One Court" } },
+      { "type": "ticker_item", "settings": { "text": "Candles · Totes · Tees" } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,594 @@
+{% comment %}
+  A Romance Court — House Initiation Product Template
+  ─────────────────────────────────────────────────────
+  File:     templates/product.initiation.liquid
+  CSS:      assets/initiation.css
+  Assets:   shield-light.svg, emerald-willow-primary.png,
+            onyx-raven-primary.png, midnight-sapphire-primary.png,
+            blood-ruby-primary.png, Emerald_Willow_Secondary.png,
+            Onyx_Raven_Secondary.png, Midnight_Sapphire_secondary.png,
+            Blood_Rubi_Secondary.png
+
+  SEO:
+  - Schema.org Product + FAQPage + BreadcrumbList structured data
+  - Semantic HTML5 landmarks (main, section, article, nav)
+  - ARIA labels on all sections
+  - itemprop microdata on price, name, description
+  - Open Graph / Twitter meta via Shopify's seo object
+  - Canonical URL auto-set by Shopify layout
+  - Image alt text on all imgs
+  - Lazy loading on below-fold images
+  - FAQ structured data (Google rich results eligible)
+{% endcomment %}
+
+{% comment %} ── SEO VARIABLES ── {% endcomment %}
+{% assign seo_title = product.title | append: ' | A Romance Court' %}
+{% assign seo_desc = product.metafields.seo.description | default: 'Join A Romance Court and be initiated into one of four Houses — Emerald Willow, Onyx Raven, Midnight Sapphire, or Blood Ruby. Annual membership includes House initiation, priority event access, House points eligibility, and Solstice Party invitations.' %}
+
+{% comment %} ── SCHEMA.ORG STRUCTURED DATA ── {% endcomment %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "description": {{ seo_desc | json }},
+      "url": {{ shop.url | append: request.path | json }},
+      "brand": { "@type": "Brand", "name": "A Romance Court" },
+      "image": {{ product.featured_image | image_url: width: 1200 | json }},
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": {{ cart.currency.iso_code | json }},
+        "price": {{ product.price | divided_by: 100.0 | json }},
+        "availability": {% if product.available %}"https://schema.org/InStock"{% else %}"https://schema.org/OutOfStock"{% endif %},
+        "url": {{ shop.url | append: request.path | json }},
+        "seller": { "@type": "Organization", "name": {{ shop.name | json }} }
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ shop.url | json }} },
+        { "@type": "ListItem", "position": 2, "name": "Membership", "item": {{ shop.url | append: '/collections/membership' | json }} },
+        { "@type": "ListItem", "position": 3, "name": {{ product.title | json }}, "item": {{ shop.url | append: request.path | json }} }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I choose my House?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No — and that's the point. Your House is revealed during the initiation ceremony by Sir Knotsalot. The alignment process considers your temperament, not your preference." }
+        },
+        {
+          "@type": "Question",
+          "name": "When does initiation take place?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Open Court takes place every Wednesday from 18:30 to 20:00. Sessions are held in store at A Romance Court and streamed live on Instagram — so you can be initiated from anywhere in the world. Once you've purchased your membership, head to our events page to sign up." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change Houses after initiation?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Twice a year — during the Solstice Parties — members may request realignment. The Court decides whether to grant it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to be local to join?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Not at all — the membership is open to everyone, wherever you are. Open Court is streamed live on Instagram every Wednesday, so you can be initiated remotely. Some benefits, like in-store events and game nights, are available in Barcelona, but House points, reading challenges, and exclusive offers are open to all members worldwide." }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does the membership last?",
+          "acceptedAnswer": { "@type": "Answer", "text": "This is an annual membership. It covers one full year of Court access, event priority, House points eligibility, and all included benefits from the date of your membership purchase." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+{{ 'arc-initiation.css' | asset_url | stylesheet_tag }}
+
+<style>
+  /* Force brand fonts on initiation product page */
+  #shopify-section-{{ section.id }} .arc-init p,
+  #shopify-section-{{ section.id }} .arc-init li,
+  #shopify-section-{{ section.id }} .arc-init .arc-body-lg,
+  #shopify-section-{{ section.id }} .arc-init .arc-pull-quote,
+  #shopify-section-{{ section.id }} .arc-init .arc-house-desc,
+  #shopify-section-{{ section.id }} .arc-init .arc-house-motto,
+  #shopify-section-{{ section.id }} .arc-init .arc-init-subtitle,
+  #shopify-section-{{ section.id }} .arc-init .arc-price-label,
+  #shopify-section-{{ section.id }} .arc-init .arc-faq-a p,
+  #shopify-section-{{ section.id }} .arc-init .arc-how-note p,
+  #shopify-section-{{ section.id }} .arc-init .arc-perk p,
+  #shopify-section-{{ section.id }} .arc-init .arc-step-body p,
+  #shopify-section-{{ section.id }} .arc-init .arc-rte p {
+    font-family: var(--font-body) !important;
+  }
+  #shopify-section-{{ section.id }} .arc-init h1,
+  #shopify-section-{{ section.id }} .arc-init h2,
+  #shopify-section-{{ section.id }} .arc-init .arc-init-title {
+    font-family: var(--font-heading) !important;
+    font-weight: normal !important;
+  }
+  #shopify-section-{{ section.id }} .arc-init h3,
+  #shopify-section-{{ section.id }} .arc-init .arc-eyebrow,
+  #shopify-section-{{ section.id }} .arc-init .arc-house-name,
+  #shopify-section-{{ section.id }} .arc-init .arc-house-traits,
+  #shopify-section-{{ section.id }} .arc-init .arc-faq-q,
+  #shopify-section-{{ section.id }} .arc-init .arc-step-num,
+  #shopify-section-{{ section.id }} .arc-init .arc-btn-primary,
+  #shopify-section-{{ section.id }} .arc-init .arc-btn-ghost {
+    font-family: var(--font-body) !important;
+  }
+  /* Fix Dawn hiding empty divs */
+  #shopify-section-{{ section.id }} .arc-section-rule,
+  #shopify-section-{{ section.id }} .arc-ring,
+  #shopify-section-{{ section.id }} .arc-step-connector {
+    display: block !important;
+  }
+</style>
+
+<main class="arc-init" id="arc-initiation-page" itemscope itemtype="https://schema.org/Product">
+
+  <meta itemprop="name" content="{{ product.title }}">
+  <meta itemprop="description" content="{{ seo_desc }}">
+  {% if product.featured_image %}
+    <meta itemprop="image" content="{{ product.featured_image | image_url: width: 1200 }}">
+  {% endif %}
+
+  <div class="arc-parchment" aria-hidden="true"></div>
+
+
+  <!-- ════════════════════════════════════════
+       1. HERO
+  ════════════════════════════════════════ -->
+  <section class="arc-init-hero" id="arc-init-hero" aria-label="Product introduction">
+
+    <div class="arc-hero-rings" aria-hidden="true">
+      <div class="arc-ring"></div>
+      <div class="arc-ring"></div>
+      <div class="arc-ring"></div>
+      <div class="arc-ring"></div>
+    </div>
+
+    <div class="arc-init-hero-inner">
+
+      <div class="arc-init-crest" aria-hidden="true">
+        <img src="{{ 'shield-light.svg' | asset_url }}" alt="A Romance Court crest" width="80" height="80" loading="eager">
+      </div>
+
+      <span class="arc-eyebrow">A Romance Court · Annual Membership</span>
+
+      <h1 class="arc-init-title" itemprop="name">
+        {{ product.title | default: 'House Initiation' }}
+      </h1>
+
+      <p class="arc-init-subtitle">
+        Four Houses. One ceremony.<br>
+        Your allegiance — revealed.
+      </p>
+
+      <div class="arc-init-price-block" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+        <meta itemprop="availability" content="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+        <span class="arc-price" itemprop="price" content="{{ product.price | divided_by: 100.0 }}">
+          {{ product.price | money }}
+        </span>
+        <span class="arc-price-label">annual membership</span>
+      </div>
+
+      <div class="arc-init-hero-cta">
+        <form method="post" action="/cart/add" class="arc-add-form">
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          {% if product.available %}
+            <button type="submit" class="arc-btn-primary" data-text="Join the Court" aria-label="Add {{ product.title }} to cart">
+              Join the Court
+            </button>
+          {% else %}
+            <button type="button" class="arc-btn-primary arc-btn-sold" disabled>
+              Initiations Closed
+            </button>
+          {% endif %}
+        </form>
+        <a href="#arc-how-it-works" class="arc-btn-ghost" data-text="How It Works">How It Works</a>
+      </div>
+
+      <div class="arc-init-hero-houses" aria-hidden="true">
+        <img src="{{ 'emerald-willow-primary.png' | asset_url }}" alt="Emerald Willow" width="52" height="52" loading="lazy">
+        <img src="{{ 'onyx-raven-primary.png' | asset_url }}"      alt="Onyx Raven"     width="52" height="52" loading="lazy">
+        <img src="{{ 'midnight-sapphire-primary.png' | asset_url }}" alt="Midnight Sapphire" width="52" height="52" loading="lazy">
+        <img src="{{ 'blood-ruby-primary.png' | asset_url }}"     alt="Blood Ruby"     width="52" height="52" loading="lazy">
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       2. WHAT YOU'RE JOINING
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-what-joining" id="arc-what-joining" aria-label="About the membership">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner arc-text-center">
+
+      <span class="arc-eyebrow arc-reveal">The Court</span>
+      <h2 class="arc-reveal">What You're Joining</h2>
+
+      <p class="arc-body-lg arc-reveal">
+        A Romance Court is more than a bookstore membership. It is an allegiance. A community structured around four Houses — each with its own temperament, identity, and philosophy.
+      </p>
+      <p class="arc-body-lg arc-reveal">
+        When you join, you are not just a customer. You become a member of the Court — with a House, a history, and a standing to build.
+      </p>
+
+      <div class="arc-ornament arc-reveal" aria-hidden="true"><span>✦</span></div>
+
+      <p class="arc-pull-quote arc-reveal">
+        "You don't choose your House.<br>Your House chooses you."
+      </p>
+
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       3. THE FOUR HOUSES
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-houses-teaser" id="arc-houses-teaser" aria-label="The four houses">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner">
+
+      <div class="arc-section-header arc-text-center">
+        <span class="arc-eyebrow arc-reveal">Choose Your Path</span>
+        <h2 class="arc-reveal">The Four Houses</h2>
+        <p class="arc-body-lg arc-reveal">Your alignment will be revealed during initiation. Until then — learn who calls to you.</p>
+      </div>
+
+      <div class="arc-house-cards">
+
+        <article class="arc-house-card arc-reveal arc-house-emerald" aria-label="House Emerald Willow">
+          <div class="arc-house-card-logo">
+            <img src="{{ 'Emerald_Willow_Secondary.png' | asset_url }}" alt="Emerald Willow symbol" width="120" height="120" loading="lazy">
+          </div>
+          <div class="arc-house-card-body">
+            <h3 class="arc-house-name">Emerald Willow</h3>
+            <p class="arc-house-traits">Wise · Enduring · Grounded</p>
+            <p class="arc-house-motto">"Bend. Whisper. Rise."</p>
+            <p class="arc-house-desc">For those who move with quiet strength and outlast the noise. Patience is their power — and the willow always survives the storm.</p>
+          </div>
+        </article>
+
+        <article class="arc-house-card arc-reveal arc-house-onyx" aria-label="House Onyx Raven">
+          <div class="arc-house-card-logo">
+            <img src="{{ 'Onyx_Raven_Secondary.png' | asset_url }}" alt="Onyx Raven symbol" width="120" height="120" loading="lazy">
+          </div>
+          <div class="arc-house-card-body">
+            <h3 class="arc-house-name">Onyx Raven</h3>
+            <p class="arc-house-traits">Strategic · Observant · Unseen</p>
+            <p class="arc-house-motto">"Sing. Haunt. Vanish."</p>
+            <p class="arc-house-desc">For those who reveal little and influence much. They see everything — and say nothing. The raven watches from the highest branch.</p>
+          </div>
+        </article>
+
+        <article class="arc-house-card arc-reveal arc-house-sapphire" aria-label="House Midnight Sapphire">
+          <div class="arc-house-card-logo">
+            <img src="{{ 'Midnight_Sapphire_secondary.png' | asset_url }}" alt="Midnight Sapphire symbol" width="120" height="120" loading="lazy">
+          </div>
+          <div class="arc-house-card-body">
+            <h3 class="arc-house-name">Midnight Sapphire</h3>
+            <p class="arc-house-traits">Mysterious · Deep · Controlled</p>
+            <p class="arc-house-motto">"Descend. Endure. Command."</p>
+            <p class="arc-house-desc">For those unafraid of shadow and depth. Their calm is not peace — it is power forged in the dark where others dare not go.</p>
+          </div>
+        </article>
+
+        <article class="arc-house-card arc-reveal arc-house-ruby" aria-label="House Blood Ruby">
+          <div class="arc-house-card-logo">
+            <img src="{{ 'Blood_Rubi_Secondary.png' | asset_url }}" alt="Blood Ruby symbol" width="120" height="120" loading="lazy">
+          </div>
+          <div class="arc-house-card-body">
+            <h3 class="arc-house-name">Blood Ruby</h3>
+            <p class="arc-house-traits">Passionate · Instinctive · Unyielding</p>
+            <p class="arc-house-motto">"Bleed. Burn. Conquer."</p>
+            <p class="arc-house-desc">For those who act without hesitation. They feel everything and fear nothing. The ruby does not bend — it breaks, and becomes more brilliant for it.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="arc-text-center" style="margin-top:3rem;">
+        <a href="{{ routes.root_url }}pages/houses" class="arc-btn-ghost arc-reveal" data-text="Explore the Houses in Full">
+          Explore the Houses in Full
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       4. WHAT'S INCLUDED
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-included" id="arc-what-included" aria-label="Membership benefits">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner">
+
+      <div class="arc-section-header arc-text-center">
+        <span class="arc-eyebrow arc-reveal">Your Membership Includes</span>
+        <h2 class="arc-reveal">What You Receive</h2>
+      </div>
+
+      <ul class="arc-perks-grid" role="list">
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">⚔</span>
+          <h3>House Initiation Ceremony</h3>
+          <p>Your official alignment — revealed publicly before the Court by Sir Knotsalot.</p>
+        </li>
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">📖</span>
+          <h3>Priority Event Access</h3>
+          <p>First access to in-store events, book launches, and Court gatherings throughout the year.</p>
+        </li>
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">✦</span>
+          <h3>House Points Eligibility</h3>
+          <p>Earn points for your House through purchases, reading challenges, event participation, game night wins, and more. Rankings are tracked at each Solstice — and one House is crowned winner at the end of the year.</p>
+        </li>
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">🌙</span>
+          <h3>Solstice Party Access</h3>
+          <p>Invitations to twice-yearly Solstice Parties — the Court's most significant seasonal gatherings.</p>
+        </li>
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">👑</span>
+          <h3>Member Exclusive Offers</h3>
+          <p>Access to member-only discounts, early releases, and Court-specific book recommendations.</p>
+        </li>
+        <li class="arc-perk arc-reveal" role="listitem">
+          <span class="arc-perk-icon" aria-hidden="true">🔮</span>
+          <h3>Realignment Eligibility</h3>
+          <p>Twice a year, members may petition the Court for realignment. The Court decides — not the member.</p>
+        </li>
+      </ul>
+
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       5. HOW IT WORKS
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-how" id="arc-how-it-works" aria-label="How initiation works">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner arc-text-center">
+
+      <div class="arc-section-header">
+        <span class="arc-eyebrow arc-reveal">The Process</span>
+        <h2 class="arc-reveal">How Initiation Works</h2>
+        <p class="arc-body-lg arc-reveal">Four steps stand between you and your House.</p>
+      </div>
+
+      <div class="arc-steps" role="list" aria-label="Initiation steps">
+        <div class="arc-step arc-reveal" role="listitem">
+          <div class="arc-step-num" aria-hidden="true">01</div>
+          <div class="arc-step-body">
+            <h3>Purchase Your Membership</h3>
+            <p>Complete your annual membership here. You'll receive confirmation by email with next steps.</p>
+          </div>
+        </div>
+        <div class="arc-step-connector" aria-hidden="true"></div>
+        <div class="arc-step arc-reveal" role="listitem">
+          <div class="arc-step-num" aria-hidden="true">02</div>
+          <div class="arc-step-body">
+            <h3>Attend Open Court</h3>
+            <p>Open Court takes place every Wednesday from 18:30 to 20:00, in store at A Romance Court and streamed live on Instagram. Whether you're in Barcelona or anywhere in the world, you can be initiated. Sign up for your session on our <a href="/pages/events">events page</a>.</p>
+          </div>
+        </div>
+        <div class="arc-step-connector" aria-hidden="true"></div>
+        <div class="arc-step arc-reveal" role="listitem">
+          <div class="arc-step-num" aria-hidden="true">03</div>
+          <div class="arc-step-body">
+            <h3>Your House Is Revealed</h3>
+            <p>Sir Knotsalot presides. Your alignment is revealed before the Court. You don't choose — your House finds you.</p>
+          </div>
+        </div>
+        <div class="arc-step-connector" aria-hidden="true"></div>
+        <div class="arc-step arc-reveal" role="listitem">
+          <div class="arc-step-num" aria-hidden="true">04</div>
+          <div class="arc-step-body">
+            <h3>Begin Earning Legacy</h3>
+            <p>Participate in events, earn House points, and build your standing. The Court keeps record of all who serve.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="arc-how-note arc-reveal">
+        <p>Realignment is available twice yearly at the Solstice Parties.</p>
+        <p>The Court decides. Not the member.</p>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       6. PRODUCT DESCRIPTION (from Shopify editor)
+  ════════════════════════════════════════ -->
+  {% if product.description != blank %}
+  <section class="arc-init-section arc-product-desc" id="arc-product-description" aria-label="Full product description">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner arc-text-center">
+      <span class="arc-eyebrow arc-reveal">From the Court</span>
+      <div class="arc-rte arc-reveal" itemprop="description">
+        {{ product.description }}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+
+  <!-- ════════════════════════════════════════
+       7. FAQ (Google rich results eligible)
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-faq" id="arc-faq" aria-label="Frequently asked questions">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner">
+
+      <div class="arc-section-header arc-text-center">
+        <span class="arc-eyebrow arc-reveal">Questions</span>
+        <h2 class="arc-reveal">Before You Join</h2>
+      </div>
+
+      <div class="arc-faq-list">
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">Can I choose my House?</summary>
+          <div class="arc-faq-a">
+            <p>No — and that's the point. Your House is revealed during the initiation ceremony by Sir Knotsalot. The alignment process considers your temperament, not your preference. Trust the Court.</p>
+          </div>
+        </details>
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">When does initiation take place?</summary>
+          <div class="arc-faq-a">
+            <p>Open Court takes place every Wednesday from 18:30 to 20:00. Sessions are held in store at A Romance Court and streamed live on Instagram — so you can be initiated from anywhere in the world. Once you've purchased your membership, head to our events page to sign up for your session.</p>
+          </div>
+        </details>
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">Can I change Houses after initiation?</summary>
+          <div class="arc-faq-a">
+            <p>Allegiance is not permanent, but it is not easily changed. Twice a year — during the Solstice Parties — members may request realignment. The Court decides whether to grant it.</p>
+          </div>
+        </details>
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">Do I need to be local to join?</summary>
+          <div class="arc-faq-a">
+            <p>Not at all — the membership is open to everyone, wherever you are. Open Court is streamed live on Instagram every Wednesday, so you can be initiated remotely. Some benefits, like in-store events and game nights, are available in Barcelona, but House points, reading challenges, and exclusive offers are open to all members worldwide.</p>
+          </div>
+        </details>
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">How long does the membership last?</summary>
+          <div class="arc-faq-a">
+            <p>This is an annual membership. It covers one full year of Court access, event priority, House points eligibility, and all included benefits from the date of your membership purchase.</p>
+          </div>
+        </details>
+
+        <details class="arc-faq-item arc-reveal">
+          <summary class="arc-faq-q">What happens to my House points?</summary>
+          <div class="arc-faq-a">
+            <p>Points contribute to both your individual standing and your House's overall ranking. Seasonal recognition and awards are given to those who serve the Court well. The Court remembers everything.</p>
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+       8. CLOSING CTA
+  ════════════════════════════════════════ -->
+  <section class="arc-init-section arc-closing-cta" id="arc-closing-cta" aria-label="Purchase membership">
+    <div class="arc-section-rule" aria-hidden="true"></div>
+    <div class="arc-init-section-inner arc-text-center">
+
+      <div class="arc-four-crests arc-reveal" aria-hidden="true">
+        <img src="{{ 'emerald-willow-primary.png' | asset_url }}" alt="" width="60" height="60" loading="lazy">
+        <img src="{{ 'onyx-raven-primary.png' | asset_url }}"      alt="" width="60" height="60" loading="lazy">
+        <img src="{{ 'midnight-sapphire-primary.png' | asset_url }}" alt="" width="60" height="60" loading="lazy">
+        <img src="{{ 'blood-ruby-primary.png' | asset_url }}"     alt="" width="60" height="60" loading="lazy">
+      </div>
+
+      <span class="arc-eyebrow arc-reveal">Your Court Awaits</span>
+      <h2 class="arc-reveal">Ready to Find<br>Your House?</h2>
+
+      <p class="arc-reveal arc-body-lg">
+        Join A Romance Court. Be initiated. Earn your standing.<br>
+        The Court is watching.
+      </p>
+
+      <div class="arc-closing-price arc-reveal">
+        <span class="arc-price">{{ product.price | money }}</span>
+        <span class="arc-price-label">annual membership</span>
+      </div>
+
+      <div class="arc-init-hero-cta arc-reveal">
+        <form method="post" action="/cart/add" class="arc-add-form">
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          {% if product.available %}
+            <button type="submit" class="arc-btn-primary" data-text="Join the Court" aria-label="Add House Initiation membership to cart">
+              Join the Court
+            </button>
+          {% else %}
+            <button type="button" class="arc-btn-primary arc-btn-sold" disabled>
+              Initiations Closed
+            </button>
+          {% endif %}
+        </form>
+        <a href="{{ routes.root_url }}pages/houses" class="arc-btn-ghost" data-text="Learn About the Houses">
+          Learn About the Houses
+        </a>
+      </div>
+
+      <div class="arc-closing-banner arc-reveal" aria-hidden="true">
+        <span class="arc-ban-house arc-ban-emerald">Emerald Willow</span>
+        <span class="arc-ban-sep">·</span>
+        <span class="arc-ban-house arc-ban-onyx">Onyx Raven</span>
+        <span class="arc-ban-sep">·</span>
+        <span class="arc-ban-house arc-ban-sapphire">Midnight Sapphire</span>
+        <span class="arc-ban-sep">·</span>
+        <span class="arc-ban-house arc-ban-ruby">Blood Ruby</span>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── Scroll reveal ──
+(function() {
+  var els = document.querySelectorAll('.arc-reveal');
+  if (!els.length || !window.IntersectionObserver) {
+    els.forEach(function(el) { el.classList.add('arc-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('arc-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(function(el) { io.observe(el); });
+})();
+
+// ── Prevent double-submit on cart forms ──
+document.querySelectorAll('.arc-add-form').forEach(function(form) {
+  form.addEventListener('submit', function() {
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn && !btn.disabled) {
+      btn.disabled = true;
+      btn.textContent = 'Adding to Court...';
+    }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Initiation Product",
+  "tag": "section",
+  "class": "arc-section-initiation-product",
+  "settings": []
+}
+{% endschema %}
