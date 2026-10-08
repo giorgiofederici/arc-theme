@@ -1,0 +1,104 @@
+/* ════════════════════════════════════════════════════════════
+   A ROMANCE COURT — Gift Card Recipient Checkbox UI Fix
+   Loaded exclusively by sections/main-product-gift-card.liquid
+   ════════════════════════════════════════════════════════════ */
+
+/* Checkbox toggle container */
+.recipient-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  cursor: pointer;
+  font-family: var(--font-body, "Gentium Book Plus", Georgia, serif);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--text-body, #371D2B);
+  user-select: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.recipient-checkbox:hover {
+  color: var(--accent-primary, #55294A);
+}
+
+.recipient-form > input[type='checkbox'] {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 2px;
+  left: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Square box (first SVG in label) */
+.recipient-checkbox > svg:first-of-type {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  overflow: visible;
+  border-radius: 3px;
+  stroke: var(--border-default, rgba(85, 41, 74, 0.28));
+  fill: rgba(241, 225, 221, 0.6);
+  transition: all 0.2s ease;
+}
+
+.recipient-checkbox > svg:first-of-type rect {
+  width: 16px;
+  height: 16px;
+  rx: 3px;
+  ry: 3px;
+  stroke-width: 1.5px;
+}
+
+.recipient-checkbox:hover > svg:first-of-type {
+  stroke: var(--accent-primary, #55294A);
+}
+
+.recipient-form > input[type='checkbox']:focus-visible + label svg:first-of-type {
+  outline: 2px solid var(--accent-primary, #55294A);
+  outline-offset: 2px;
+}
+
+/* Checkmark (second SVG) - centered with transform inside the 18px square box */
+.recipient-form .icon-checkmark {
+  visibility: hidden;
+  position: absolute;
+  left: 9px;
+  top: 11px; /* 2px margin-top + 9px center of 18px box */
+  transform: translate(-50%, -50%);
+  width: 11px;
+  height: 8.5px;
+  margin: 0 !important;
+  color: var(--arc-blush, #F1E1DD);
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.15s ease;
+}
+
+.recipient-form .icon-checkmark path {
+  fill: currentColor;
+}
+
+/* Checked state: solid filled plum box with crisp blush checkmark */
+.recipient-form > input[type='checkbox']:checked + label svg:first-of-type {
+  fill: var(--accent-primary, #55294A);
+  stroke: var(--accent-primary, #55294A);
+  background-color: var(--accent-primary, #55294A);
+}
+
+.recipient-form > input[type='checkbox']:checked + label svg:first-of-type rect {
+  fill: var(--accent-primary, #55294A);
+  stroke: var(--accent-primary, #55294A);
+}
+
+.recipient-form > input[type='checkbox']:checked + label .icon-checkmark {
+  visibility: visible;
+  color: var(--arc-blush, #F1E1DD);
+}
