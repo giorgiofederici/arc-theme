@@ -296,7 +296,7 @@
             {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
           </div>
 
-          {% comment %} ─── BUTTONS (Accelerated checkout omitted for gift card recipient delivery) ─── {% endcomment %}
+          {% comment %} ─── BUTTONS (With smart dynamic checkout toggle for gift cards) ─── {% endcomment %}
           <div class="arc-product__buttons">
             {%- if product.available -%}
               <button
@@ -319,6 +319,10 @@
                   </svg>
                 </span>
               </button>
+
+              <div class="arc-product__dynamic-checkout" data-arc-dynamic-checkout>
+                {{ form | payment_button }}
+              </div>
             {%- else -%}
               <button type="button" class="arc-btn arc-btn--primary arc-btn--disabled" disabled>
                 Sold Out
@@ -589,6 +593,7 @@
           // Resetta i campi del destinatario al successo
           if (recipientForm && typeof recipientForm.resetRecipientForm === 'function') {
             recipientForm.resetRecipientForm();
+            updateDynamicCheckout();
           }
 
           const cartRes = await fetch('/cart.js');
@@ -621,6 +626,22 @@
           form.submit();
         }
       });
+    }
+
+    // ── Smart Dynamic Checkout Toggle ──
+    const dynamicCheckout = root.querySelector('[data-arc-dynamic-checkout]');
+    const recipientCheckbox = root.querySelector('.recipient-form > input[type="checkbox"]');
+    function updateDynamicCheckout() {
+      if (!dynamicCheckout || !recipientCheckbox) return;
+      if (recipientCheckbox.checked) {
+        dynamicCheckout.classList.add('is-hidden');
+      } else {
+        dynamicCheckout.classList.remove('is-hidden');
+      }
+    }
+    if (recipientCheckbox) {
+      recipientCheckbox.addEventListener('change', updateDynamicCheckout);
+      updateDynamicCheckout();
     }
   })();
 </script>

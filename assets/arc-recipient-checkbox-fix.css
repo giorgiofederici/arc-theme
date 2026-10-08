@@ -102,3 +102,16 @@
   visibility: visible;
   color: var(--arc-blush, #F1E1DD);
 }
+
+/* Smart Dynamic Checkout Toggle:
+   When recipient checkbox is checked (sending as a gift), hide dynamic checkout (PayPal / Apple Pay)
+   so buyers use Add to Cart to guarantee recipient properties are safely captured. */
+.arc-product__form:has(.recipient-form > input[type='checkbox']:checked) [data-arc-dynamic-checkout],
+[data-arc-dynamic-checkout].is-hidden {
+  display: none !important;
+}
+
+[data-arc-dynamic-checkout] {
+  margin-top: 1rem;
+  width: 100%;
+}
